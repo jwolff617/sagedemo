@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sage · Phase 1 Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:        #08080A;
+  --surface:   #0F0F12;
+  --card:      #161619;
+  --border:    #252529;
+  --border2:   #333338;
+  --gold:      #C9A84C;
+  --gold-dim:  #6B5520;
+  --gold-soft: #E8C97A;
+  --teal:      #0D9488;
+  --teal-lt:   #5EEAD4;
+  --white:     #F2F2F4;
+  --body:      #C8C8D0;
+  --muted:     #88889A;
+  --danger:    #E05555;
+}
+
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+  font-weight:400;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── TOP BAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.25rem;height:48px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  z-index:50;
+}
+.topbar-logo{
+  font-family:'EB Garamond',serif;
+  font-size:1.25rem;font-weight:700;
+  letter-spacing:0.12em;color:var(--white);
+}
+.topbar-logo span{color:var(--gold)}
+.topbar-sub{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;letter-spacing:0.18em;
+  color:var(--gold-dim);text-transform:uppercase;
+  margin-left:0.75rem;
+}
+.topbar-right{display:flex;align-items:center;gap:0.5rem}
+
+/* view toggle */
+.view-toggle{
+  display:flex;background:var(--card);
+  border:1px solid var(--border);border-radius:6px;
+  overflow:hidden;
+}
+.view-btn{
+  padding:0.3rem 0.75rem;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.65rem;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--muted);
+  background:none;border:none;cursor:pointer;
+  transition:all 0.15s;
+}
+.view-btn.active{background:var(--gold-dim);color:var(--gold-soft)}
+.view-btn:hover:not(.active){color:var(--white)}
+
+.icon-btn{
+  width:32px;height:32px;border-radius:6px;
+  border:1px solid var(--border);background:var(--card);
+  color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;transition:all 0.15s;
+}
+.icon-btn:hover{border-color:var(--border2);color:var(--white)}
+
+/* ── LAYOUT ── */
+.app-body{
+  flex:1;display:flex;overflow:hidden;
+}
+
+/* ── LEFT SIDEBAR ── */
+.sidebar{
+  width:220px;flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.sidebar-section{
+  padding:0.75rem 1rem 0.5rem;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;letter-spacing:0.15em;
+  text-transform:uppercase;color:var(--gold-dim);
+  border-bottom:1px solid var(--border);
+}
+.tree-list{flex:1;overflow-y:auto;padding:0.5rem 0}
+.tree-list::-webkit-scrollbar{width:3px}
+.tree-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.tree-node{
+  display:flex;align-items:center;gap:0.4rem;
+  padding:0.3rem 1rem;cursor:pointer;
+  font-size:0.8rem;color:var(--body);
+  transition:all 0.12s;border-left:2px solid transparent;
+  user-select:none;
+}
+.tree-node:hover{background:rgba(201,168,76,0.05);color:var(--white)}
+.tree-node.active{
+  background:rgba(201,168,76,0.08);
+  border-left-color:var(--gold);color:var(--gold-soft);
+}
+.tree-node.child{padding-left:1.75rem;font-size:0.75rem}
+.tree-node.grandchild{padding-left:2.5rem;font-size:0.72rem;color:var(--muted)}
+.tree-node.grandchild:hover{color:var(--body)}
+.tree-node.grandchild.active{color:var(--gold-soft)}
+.node-icon{font-size:0.7rem;opacity:0.7}
+.node-cmd{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;color:var(--teal);
+  margin-left:auto;opacity:0.7;
+}
+
+/* ── MAIN AREA ── */
+.main{
+  flex:1;display:flex;flex-direction:column;overflow:hidden;
+}
+
+/* ── TREE PATH BREADCRUMB ── */
+.breadcrumb{
+  padding:0.5rem 1.25rem;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;color:var(--muted);
+  display:flex;align-items:center;gap:0.4rem;
+  flex-shrink:0;
+}
+.bc-seg{color:var(--body);cursor:pointer}
+.bc-seg:hover{color:var(--gold)}
+.bc-seg.active{color:var(--gold-soft)}
+.bc-arrow{color:var(--border2)}
+
+/* ── STARDUST CODE VIEW ── */
+.code-view{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0.75rem 1.25rem;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;
+  color:var(--body);
+  flex-shrink:0;
+  max-height:140px;
+  overflow-y:auto;
+  display:none;
+}
+.code-view.visible{display:block}
+.code-prompt{color:var(--gold)}
+.code-tree{color:var(--teal-lt);margin-top:0.25rem;white-space:pre}
+.code-dim{color:var(--muted)}
+
+/* ── APP GRID VIEW ── */
+.app-grid-view{
+  flex:1;overflow:auto;padding:1.25rem;
+  display:none;
+}
+.app-grid-view.visible{display:block}
+.grid-title{
+  font-family:'EB Garamond',serif;
+  font-size:1.4rem;font-weight:700;
+  color:var(--white);margin-bottom:0.25rem;
+}
+.grid-subtitle{font-size:0.8rem;color:var(--muted);margin-bottom:1.25rem}
+.box-grid{
+  display:flex;flex-wrap:wrap;gap:0.6rem;
+  align-items:flex-start;
+}
+.box-node{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:0.6rem 0.85rem;
+  cursor:pointer;
+  transition:all 0.15s;
+  min-width:100px;
+}
+.box-node:hover{border-color:var(--border2);transform:translateY(-1px)}
+.box-node.selected{border-color:var(--gold);background:rgba(201,168,76,0.06)}
+.box-node.parent-box{
+  border-top:2px solid var(--teal);
+  min-width:130px;
+}
+.box-node.parent-box.selected{border-top-color:var(--gold)}
+.box-label{font-size:0.8rem;font-weight:500;color:var(--white)}
+.box-cmd{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;color:var(--teal-lt);
+  margin-top:0.2rem;
+}
+.box-count{font-size:0.7rem;color:var(--muted);margin-top:0.15rem}
+.grid-arrow{
+  color:var(--border2);font-size:1rem;
+  display:flex;align-items:center;
+  align-self:center;
+}
+.child-grid{
+  display:flex;flex-wrap:wrap;gap:0.5rem;
+  margin-top:0.75rem;padding-top:0.75rem;
+  border-top:1px solid var(--border);
+  width:100%;
+}
+
+/* ── CHAT VIEW ── */
+.chat-view{
+  flex:1;overflow:hidden;display:flex;flex-direction:column;
+}
+.chat-messages{
+  flex:1;overflow-y:auto;padding:1.25rem;
+  display:flex;flex-direction:column;gap:1rem;
+}
+.chat-messages::-webkit-scrollbar{width:3px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.msg{display:flex;gap:0.75rem;align-items:flex-start;animation:msgIn 0.25s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-avatar{
+  width:28px;height:28px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.7rem;font-weight:700;flex-shrink:0;
+  font-family:'EB Garamond',serif;
+}
+.msg-avatar.sage{background:var(--gold-dim);color:var(--gold-soft)}
+.msg-avatar.user{background:var(--border2);color:var(--body)}
+.msg-content{flex:1;padding-top:0.1rem}
+.msg-name{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:0.3rem;
+}
+.msg-text{font-size:0.875rem;color:var(--body);line-height:1.7}
+.msg-text.user-text{color:var(--white)}
+.msg-cmd{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.78rem;color:var(--teal-lt);
+  background:rgba(13,148,136,0.08);
+  border:1px solid rgba(13,148,136,0.2);
+  border-radius:4px;padding:0.1rem 0.4rem;
+  display:inline-block;
+}
+.msg-tree{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:6px;padding:0.75rem 1rem;
+  margin-top:0.5rem;color:var(--teal-lt);
+  white-space:pre;overflow-x:auto;
+}
+.entry-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:1rem 1.1rem;
+  margin-top:0.5rem;
+}
+.entry-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;color:var(--gold);
+  letter-spacing:0.1em;text-transform:uppercase;
+  margin-bottom:0.4rem;
+}
+.entry-text{font-size:0.875rem;color:var(--body);line-height:1.75}
+.entry-meta{
+  font-size:0.72rem;color:var(--muted);margin-top:0.5rem;
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* suggestions dropdown */
+.suggestions{
+  background:var(--card);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  overflow:hidden;
+  margin:0 1.25rem 0.5rem;
+  display:none;
+}
+.suggestions.visible{display:block}
+.sug-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.5rem 1rem;cursor:pointer;
+  transition:background 0.1s;font-size:0.8rem;
+}
+.sug-item:hover,.sug-item.highlighted{background:rgba(201,168,76,0.08)}
+.sug-item:not(:last-child){border-bottom:1px solid var(--border)}
+.sug-cmd{font-family:'JetBrains Mono',monospace;color:var(--teal-lt);font-size:0.78rem}
+.sug-desc{color:var(--muted);font-size:0.75rem}
+.sug-badge{
+  font-family:'JetBrains Mono',monospace;font-size:0.6rem;
+  color:var(--gold);background:rgba(201,168,76,0.1);
+  border:1px solid var(--gold-dim);border-radius:3px;
+  padding:0.1rem 0.35rem;
+}
+
+/* ── INPUT AREA ── */
+.input-wrap{
+  padding:0.75rem 1.25rem 1rem;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.input-row{display:flex;gap:0.5rem;align-items:flex-end}
+.input-box{
+  flex:1;background:var(--card);
+  border:1px solid var(--border2);border-radius:8px;
+  padding:0.65rem 1rem;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.85rem;color:var(--teal-lt);
+  resize:none;outline:none;
+  min-height:40px;max-height:120px;
+  transition:border-color 0.15s;
+  line-height:1.5;
+}
+.input-box::placeholder{color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.82rem}
+.input-box:focus{border-color:var(--gold-dim)}
+.send-btn{
+  width:40px;height:40px;border-radius:8px;
+  background:var(--gold);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--bg);font-size:1rem;
+  transition:all 0.15s;flex-shrink:0;
+}
+.send-btn:hover{background:var(--gold-soft)}
+.send-btn:disabled{background:var(--border);cursor:default;color:var(--muted)}
+.input-hint{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;color:var(--muted);
+  margin-top:0.4rem;letter-spacing:0.05em;
+}
+
+/* ── RIGHT PANEL (dict / settings) ── */
+.right-panel{
+  width:260px;flex-shrink:0;
+  background:var(--surface);
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  transition:width 0.2s ease;
+}
+.right-panel.collapsed{width:0;border-left:none}
+.panel-header{
+  padding:0.75rem 1rem;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.panel-title{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.65rem;letter-spacing:0.15em;
+  text-transform:uppercase;color:var(--gold);
+}
+.panel-close{
+  background:none;border:none;color:var(--muted);
+  cursor:pointer;font-size:0.9rem;
+  transition:color 0.15s;
+}
+.panel-close:hover{color:var(--white)}
+.panel-body{flex:1;overflow-y:auto;padding:0.75rem 0}
+.panel-body::-webkit-scrollbar{width:3px}
+.panel-body::-webkit-scrollbar-thumb{background:var(--border2)}
+
+.dict-item{
+  padding:0.75rem 1rem;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+}
+.dict-item:last-child{border-bottom:none}
+.dict-check-row{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.35rem}
+.dict-check{
+  width:16px;height:16px;border-radius:3px;
+  border:1px solid var(--border2);
+  background:var(--card);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all 0.15s;
+}
+.dict-check.checked{background:var(--teal);border-color:var(--teal);color:var(--bg);font-size:0.6rem}
+.dict-name-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;color:var(--gold);letter-spacing:0.08em;
+}
+.dict-desc-sm{font-size:0.75rem;color:var(--muted);line-height:1.55;padding-left:1.4rem}
+
+.settings-row{
+  padding:0.6rem 1rem;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);font-size:0.8rem;
+}
+.settings-row:last-child{border-bottom:none}
+.settings-label{color:var(--body)}
+.toggle{
+  width:32px;height:18px;border-radius:9px;
+  background:var(--border2);border:none;cursor:pointer;
+  position:relative;transition:background 0.2s;flex-shrink:0;
+}
+.toggle.on{background:var(--teal)}
+.toggle::after{
+  content:'';position:absolute;
+  top:2px;left:2px;width:14px;height:14px;
+  border-radius:50%;background:var(--white);
+  transition:transform 0.2s;
+}
+.toggle.on::after{transform:translateX(14px)}
+
+/* loading dots */
+.loading-dots span{
+  display:inline-block;width:5px;height:5px;
+  border-radius:50%;background:var(--gold);
+  margin:0 2px;
+  animation:dot 1.2s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2){animation-delay:0.2s}
+.loading-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes dot{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+
+/* empty state */
+.empty-state{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:2rem;
+  color:var(--muted);
+}
+.empty-logo{
+  font-family:'EB Garamond',serif;
+  font-size:3rem;font-weight:700;
+  letter-spacing:0.1em;color:var(--border2);
+  margin-bottom:0.5rem;
+}
+.empty-hint{font-size:0.8rem;line-height:1.7;max-width:320px}
+.quick-chip{
+  display:inline-block;
+  margin:0.25rem;padding:0.3rem 0.75rem;
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:20px;font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;color:var(--teal-lt);cursor:pointer;
+  transition:all 0.15s;
+}
+.quick-chip:hover{border-color:var(--teal);color:var(--white)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center">
+    <div class="topbar-logo">S<span>AGE</span></div>
+    <div class="topbar-sub">STARDUST · Phase 1</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:0.75rem">
+    <div class="view-toggle">
+      <button class="view-btn active" id="btn-chat" onclick="setView('chat')">Chat</button>
+      <button class="view-btn" id="btn-app" onclick="setView('app')">App</button>
+    </div>
+    <button class="icon-btn" id="dict-toggle-btn" onclick="togglePanel('dict')" title="Dictionaries">📖</button>
+    <button class="icon-btn" id="settings-toggle-btn" onclick="togglePanel('settings')" title="Settings">⚙</button>
+  </div>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- LEFT SIDEBAR: Tree Navigation -->
+  <div class="sidebar">
+    <div class="sidebar-section">STARDUST Tree</div>
+    <div class="tree-list" id="tree-list"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb" id="breadcrumb">
+      <span class="bc-seg active" onclick="navTo('root')">~</span>
+    </div>
+
+    <!-- CODE VIEW (STARDUST view) -->
+    <div class="code-view" id="code-view">
+      <span class="code-prompt">sage › </span><span id="code-context" class="code-tree">root</span>
+      <div id="code-tree-display" class="code-dim" style="margin-top:0.35rem"></div>
+    </div>
+
+    <!-- APP GRID VIEW -->
+    <div class="app-grid-view" id="app-grid-view"></div>
+
+    <!-- CHAT VIEW -->
+    <div class="chat-view" id="chat-view">
+      <div class="chat-messages" id="chat-messages">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-logo">SAGE</div>
+          <div class="empty-hint" style="margin-bottom:1.25rem">Type or speak the shortest abbreviation of what you want. The AI resolves, chains, and executes.</div>
+          <div>
+            <div class="quick-chip" onclick="useChip('prv diary write today felt peaceful')">prv diary write</div>
+            <div class="quick-chip" onclick="useChip('hm util track electric bill')">hm util track</div>
+            <div class="quick-chip" onclick="useChip('prv lust new attraction logged')">prv lust log</div>
+            <div class="quick-chip" onclick="useChip('soc frnd add alex goals hiking')">soc frnd add</div>
+            <div class="quick-chip" onclick="useChip('pln goal new learn guitar 90 days')">pln goal new</div>
+            <div class="quick-chip" onclick="useChip('prv drm last night forest and stars')">prv drm log</div>
+            <div class="quick-chip" onclick="useChip('pln evnt concert friday night')">pln evnt add</div>
+            <div class="quick-chip" onclick="useChip('pln place fav coffee shop downtown')">pln place save</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUGGESTIONS -->
+      <div class="suggestions" id="suggestions"></div>
+
+      <!-- INPUT -->
+      <div class="input-wrap">
+        <div class="input-row">
+          <textarea class="input-box" id="input-box"
+            placeholder="type shortest abbreviation · voice + text simultaneous"
+            rows="1"
+            onkeydown="handleKey(event)"
+            oninput="handleInput(this)"></textarea>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>➤</button>
+        </div>
+        <div class="input-hint">enter to send · tab to select suggestion · esc to clear</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel collapsed" id="right-panel">
+    <div class="panel-header">
+      <div class="panel-title" id="panel-title">Dictionaries</div>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div class="panel-body" id="panel-body"></div>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+const STATE = {
+  view: 'chat',
+  activeNode: 'root',
+  panel: null,
+  dicts: {
+    core: true,
+    urbanwolf: false,
+    outlaw: false,
+  },
+  settings: {
+    voice: true,
+    suggestions: true,
+    codeView: true,
+    autoChain: true,
+  },
+  entries: {},
+  sugHighlight: -1,
+};
+
+// ── TREE DEFINITION ────────────────────────────────────────────────────────
+const TREE = {
+  root: { label: 'Sage', icon: '✦', cmd: '~', children: ['prv','hm','soc','pln','knw'] },
+  prv: { label: 'Private', icon: '🔐', cmd: 'prv', parent: 'root',
+    children: ['prv_diary','prv_lust','prv_drm','prv_trma','prv_rage','prv_blf','prv_lgcy'] },
+  prv_diary: { label: 'Diary', icon: '📓', cmd: 'prv diary', parent: 'prv', children: [] },
+  prv_lust: { label: 'Lust', icon: '🔥', cmd: 'prv lust', parent: 'prv', children: [] },
+  prv_drm: { label: 'Dreams', icon: '🌙', cmd: 'prv drm', parent: 'prv', children: [] },
+  prv_trma: { label: 'Trauma', icon: '🩹', cmd: 'prv trma', parent: 'prv', children: [] },
+  prv_rage: { label: 'Rage', icon: '⚡', cmd: 'prv rage', parent: 'prv', children: [] },
+  prv_blf: { label: 'Beliefs', icon: '🕊', cmd: 'prv blf', parent: 'prv', children: [] },
+  prv_lgcy: { label: 'Legacy', icon: '📜', cmd: 'prv lgcy', parent: 'prv', children: [] },
+  hm: { label: 'Home', icon: '🏠', cmd: 'hm', parent: 'root',
+    children: ['hm_util','hm_rsrc','hm_mnt','hm_sec','hm_fin'] },
+  hm_util: { label: 'Utilities', icon: '⚡', cmd: 'hm util', parent: 'hm', children: [] },
+  hm_rsrc: { label: 'Resources', icon: '📦', cmd: 'hm rsrc', parent: 'hm', children: [] },
+  hm_mnt: { label: 'Maintenance', icon: '🔧', cmd: 'hm mnt', parent: 'hm', children: [] },
+  hm_sec: { label: 'Security', icon: '🔒', cmd: 'hm sec', parent: 'hm', children: [] },
+  hm_fin: { label: 'Finance', icon: '💰', cmd: 'hm fin', parent: 'hm', children: [] },
+  soc: { label: 'Social', icon: '👥', cmd: 'soc', parent: 'root',
+    children: ['soc_frnd','soc_dat','soc_sup','soc_skl'] },
+  soc_frnd: { label: 'Friends', icon: '🤝', cmd: 'soc frnd', parent: 'soc', children: [] },
+  soc_dat: { label: 'Connections', icon: '💫', cmd: 'soc dat', parent: 'soc', children: [] },
+  soc_sup: { label: 'Support', icon: '🫂', cmd: 'soc sup', parent: 'soc', children: [] },
+  soc_skl: { label: 'Skills Exchange', icon: '🔄', cmd: 'soc skl', parent: 'soc', children: [] },
+  pln: { label: 'Planning', icon: '📅', cmd: 'pln', parent: 'root',
+    children: ['pln_goal','pln_evnt','pln_place','pln_trvl','pln_idea','pln_mlstn'] },
+  pln_goal: { label: 'Goals', icon: '🎯', cmd: 'pln goal', parent: 'pln', children: [] },
+  pln_evnt: { label: 'Events', icon: '📆', cmd: 'pln evnt', parent: 'pln', children: [] },
+  pln_place: { label: 'Places', icon: '📍', cmd: 'pln place', parent: 'pln', children: [] },
+  pln_trvl: { label: 'Travel', icon: '✈', cmd: 'pln trvl', parent: 'pln', children: [] },
+  pln_idea: { label: 'Ideas', icon: '💡', cmd: 'pln idea', parent: 'pln', children: [] },
+  pln_mlstn: { label: 'Milestones', icon: '🏆', cmd: 'pln mlstn', parent: 'pln', children: [] },
+  knw: { label: 'Knowledge', icon: '🧠', cmd: 'knw', parent: 'root',
+    children: ['knw_cap','knw_res','knw_drm','knw_lgcy'] },
+  knw_cap: { label: 'Capture', icon: '📸', cmd: 'knw cap', parent: 'knw', children: [] },
+  knw_res: { label: 'Research', icon: '🔍', cmd: 'knw res', parent: 'knw', children: [] },
+  knw_drm: { label: 'Dream Log', icon: '🌀', cmd: 'knw drm', parent: 'knw', children: [] },
+  knw_lgcy: { label: 'Legacy Vault', icon: '🏛', cmd: 'knw lgcy', parent: 'knw', children: [] },
+};
+
+// Suggestions corpus
+const SUGGESTIONS = [
+  { cmd: 'prv diary wrt', desc: 'Write a diary entry', node: 'prv_diary', badge: 'prv' },
+  { cmd: 'prv diary read', desc: 'Read past entries', node: 'prv_diary', badge: 'prv' },
+  { cmd: 'prv lust log', desc: 'Log a private feeling', node: 'prv_lust', badge: 'prv' },
+  { cmd: 'prv drm log', desc: 'Record a dream', node: 'prv_drm', badge: 'prv' },
+  { cmd: 'prv rage vent', desc: 'Release into the vault', node: 'prv_rage', badge: 'prv' },
+  { cmd: 'prv trma note', desc: 'Log a trauma note', node: 'prv_trma', badge: 'prv' },
+  { cmd: 'prv blf add', desc: 'Record a belief', node: 'prv_blf', badge: 'prv' },
+  { cmd: 'prv lgcy msg', desc: 'Write a legacy message', node: 'prv_lgcy', badge: 'prv' },
+  { cmd: 'hm util track', desc: 'Track a utility', node: 'hm_util', badge: 'hm' },
+  { cmd: 'hm rsrc add', desc: 'Log a home resource', node: 'hm_rsrc', badge: 'hm' },
+  { cmd: 'hm mnt req', desc: 'Request maintenance', node: 'hm_mnt', badge: 'hm' },
+  { cmd: 'hm fin track', desc: 'Track home expense', node: 'hm_fin', badge: 'hm' },
+  { cmd: 'soc frnd add', desc: 'Add a friend profile', node: 'soc_frnd', badge: 'soc' },
+  { cmd: 'soc frnd log', desc: 'Log time with friend', node: 'soc_frnd', badge: 'soc' },
+  { cmd: 'soc dat log', desc: 'Log a connection note', node: 'soc_dat', badge: 'soc' },
+  { cmd: 'pln goal new', desc: 'Create a new goal', node: 'pln_goal', badge: 'pln' },
+  { cmd: 'pln goal upd', desc: 'Update goal progress', node: 'pln_goal', badge: 'pln' },
+  { cmd: 'pln evnt add', desc: 'Add an event', node: 'pln_evnt', badge: 'pln' },
+  { cmd: 'pln place sav', desc: 'Save a place', node: 'pln_place', badge: 'pln' },
+  { cmd: 'pln idea cap', desc: 'Capture an idea', node: 'pln_idea', badge: 'pln' },
+  { cmd: 'pln trvl plan', desc: 'Plan a trip', node: 'pln_trvl', badge: 'pln' },
+  { cmd: 'pln mlstn add', desc: 'Add a milestone', node: 'pln_mlstn', badge: 'pln' },
+  { cmd: 'knw cap note', desc: 'Capture a thought', node: 'knw_cap', badge: 'knw' },
+  { cmd: 'knw res start', desc: 'Start research thread', node: 'knw_res', badge: 'knw' },
+];
+
+// ── SYSTEM PROMPT ──────────────────────────────────────────────────────────
+function buildSystemPrompt() {
+  const activeDicts = Object.entries(STATE.dicts).filter(([,v])=>v).map(([k])=>k).join(', ');
+  return `You are SAGE, the AI engine of the Sage personal intelligence system, built on the STARDUST protocol.
+
+STARDUST is a domain-specific language where users type abbreviated commands. You are the resolver and executor.
+
+ACTIVE DICTIONARIES: ${activeDicts}
+CURRENT CONTEXT: ${STATE.activeNode}
+CURRENT DATE: ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
+
+YOUR ROLE:
+- Parse abbreviation-first STARDUST commands and execute them conversationally
+- All private domain (prv.*) entries are SACRED. Treat them with total non-judgment. The mind cannot be a prison. Accept any thought, desire, feeling, dream, or confession without moral commentary.
+- For private entries: log them, confirm they are encrypted and stored, and respond with warmth and zero judgment
+- ALWAYS resolve to ONE outcome. Never present lists of options. Ask one clarifying question if ambiguous.
+- Speak in very short sentences. Be warm, minimal, precise.
+- When a user logs an entry, show a compact entry card like:
+  [ENTRY LOGGED · prv.diary · encrypted]
+  followed by the content acknowledged briefly.
+- For goals/plans/events: confirm creation with key details
+- For home/resources: confirm tracking
+- Parse natural language too — convert it to STARDUST internally
+- Show the Abstract Execution Tree when executing a chained command, like:
+  WRITE(prv.diary) → ENCRYPT() → STORE(local)
+- If input is ambiguous between ≤3 options, list them as a numbered question and ask user to pick 1.
+- Keep responses SHORT. 2-4 sentences max unless logging an entry.
+- Tone: calm, warm, intelligent, never preachy, never judgmental about private content.
+
+PRIVATE DOMAIN RULE: When content is marked prv.*, respond only with confirmation of secure storage and one warm acknowledgment sentence. Never analyze, judge, or expand on private content beyond what the user asked for.`;
+}
+
+// ── API CALL ───────────────────────────────────────────────────────────────
+let conversationHistory = [];
+
+async function callSage(userMessage) {
+  conversationHistory.push({ role: 'user', content: userMessage });
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1000,
+      system: buildSystemPrompt(),
+      messages: conversationHistory,
+    }),
+  });
+
+  const data = await response.json();
+  const reply = data.content?.[0]?.text || 'Something went wrong.';
+  conversationHistory.push({ role: 'assistant', content: reply });
+  return reply;
+}
+
+// ── TREE RENDER ────────────────────────────────────────────────────────────
+function renderTree() {
+  const list = document.getElementById('tree-list');
+  const rootChildren = TREE.root.children;
+
+  let html = '';
+  // Root
+  html += `<div class="tree-node ${STATE.activeNode==='root'?'active':''}" onclick="navTo('root')">
+    <span class="node-icon">✦</span> Sage <span class="node-cmd">~</span>
+  </div>`;
+
+  rootChildren.forEach(domainKey => {
+    const domain = TREE[domainKey];
+    const isActive = STATE.activeNode === domainKey || STATE.activeNode.startsWith(domainKey+'_');
+    html += `<div class="tree-node child ${STATE.activeNode===domainKey?'active':''}" onclick="navTo('${domainKey}')">
+      <span class="node-icon">${domain.icon}</span> ${domain.label}
+      <span class="node-cmd">${domain.cmd}</span>
+    </div>`;
+    if (isActive && domain.children.length) {
+      domain.children.forEach(childKey => {
+        const child = TREE[childKey];
+        html += `<div class="tree-node grandchild ${STATE.activeNode===childKey?'active':''}" onclick="navTo('${childKey}')">
+          <span class="node-icon">${child.icon}</span> ${child.label}
+          <span class="node-cmd">${child.cmd}</span>
+        </div>`;
+      });
+    }
+  });
+
+  list.innerHTML = html;
+}
+
+// ── BREADCRUMB ─────────────────────────────────────────────────────────────
+function renderBreadcrumb() {
+  const node = TREE[STATE.activeNode];
+  const crumbs = [];
+  let cur = STATE.activeNode;
+  while (cur && cur !== 'root') {
+    crumbs.unshift({ key: cur, label: TREE[cur].label });
+    cur = TREE[cur].parent;
+  }
+  crumbs.unshift({ key: 'root', label: '~' });
+
+  let html = crumbs.map((c,i) =>
+    `<span class="bc-seg ${i===crumbs.length-1?'active':''}" onclick="navTo('${c.key}')">${c.label}</span>`
+  ).join('<span class="bc-arrow"> › </span>');
+
+  document.getElementById('breadcrumb').innerHTML = html;
+}
+
+// ── CODE VIEW ─────────────────────────────────────────────────────────────
+function renderCodeView() {
+  const node = TREE[STATE.activeNode];
+  const codeView = document.getElementById('code-view');
+  if (!STATE.settings.codeView || STATE.view !== 'chat') {
+    codeView.classList.remove('visible');
+    return;
+  }
+  codeView.classList.add('visible');
+  document.getElementById('code-context').textContent = node.cmd;
+
+  let tree = '';
+  if (node.children && node.children.length) {
+    const childLines = node.children.map(k => {
+      const c = TREE[k];
+      return `  ├─ ${c.cmd.padEnd(16)} ${c.label}`;
+    });
+    tree = childLines.join('\n');
+  } else if (node.parent) {
+    tree = `  parent: ${TREE[node.parent].cmd}\n  scope: leaf node`;
+  }
+  document.getElementById('code-tree-display').textContent = tree;
+}
+
+// ── APP GRID VIEW ─────────────────────────────────────────────────────────
+function renderAppGrid() {
+  const view = document.getElementById('app-grid-view');
+  const node = TREE[STATE.activeNode];
+  const rootChildren = TREE.root.children;
+
+  let html = '';
+  if (STATE.activeNode === 'root') {
+    html = `<div class="grid-title">Sage · Phase 1</div>
+    <div class="grid-subtitle">All domain trees · tap to navigate</div>
+    <div class="box-grid">`;
+    rootChildren.forEach(key => {
+      const n = TREE[key];
+      html += `<div class="box-node parent-box ${STATE.activeNode===key?'selected':''}" onclick="navTo('${key}')">
+        <div class="box-label">${n.icon} ${n.label}</div>
+        <div class="box-cmd">${n.cmd}</div>
+        <div class="box-count">${n.children.length} nodes</div>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    // Show parent domain + children
+    const domainKey = node.parent === 'root' ? STATE.activeNode : node.parent;
+    const domain = TREE[domainKey];
+    html = `<div class="grid-title">${domain.icon} ${domain.label}</div>
+    <div class="grid-subtitle"><span class="box-cmd" style="font-family:JetBrains Mono,monospace;font-size:0.72rem;color:var(--teal-lt)">${domain.cmd}</span> · ${domain.children.length} sub-nodes</div>
+    <div class="box-grid">`;
+    html += `<div class="box-node parent-box selected" onclick="navTo('${domainKey}')">
+      <div class="box-label">${domain.icon} ${domain.label}</div>
+      <div class="box-cmd">${domain.cmd}</div>
+    </div>
+    <div class="grid-arrow">›</div>`;
+    domain.children.forEach(key => {
+      const n = TREE[key];
+      html += `<div class="box-node ${STATE.activeNode===key?'selected':''}" onclick="navTo('${key}')">
+        <div class="box-label">${n.icon} ${n.label}</div>
+        <div class="box-cmd">${n.cmd}</div>
+      </div>`;
+    });
+    html += `</div>`;
+
+    // Entries for active leaf
+    const entries = STATE.entries[STATE.activeNode] || [];
+    if (entries.length) {
+      html += `<div class="child-grid">`;
+      entries.forEach(e => {
+        html += `<div class="box-node" style="min-width:200px;max-width:300px">
+          <div class="box-cmd">${e.timestamp}</div>
+          <div class="box-label" style="font-size:0.8rem;font-weight:400;color:var(--body);margin-top:0.25rem">${e.preview}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+  }
+
+  view.innerHTML = html;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function navTo(key) {
+  STATE.activeNode = key;
+  renderTree();
+  renderBreadcrumb();
+  renderCodeView();
+  if (STATE.view === 'app') renderAppGrid();
+}
+
+// ── VIEW SWITCH ───────────────────────────────────────────────────────────
+function setView(v) {
+  STATE.view = v;
+  document.getElementById('btn-chat').classList.toggle('active', v==='chat');
+  document.getElementById('btn-app').classList.toggle('active', v==='app');
+  document.getElementById('chat-view').style.display = v==='chat'?'flex':'none';
+  document.getElementById('app-grid-view').classList.toggle('visible', v==='app');
+  renderCodeView();
+  if (v==='app') renderAppGrid();
+}
+
+// ── PANEL ─────────────────────────────────────────────────────────────────
+function togglePanel(which) {
+  if (STATE.panel === which) { closePanel(); return; }
+  STATE.panel = which;
+  document.getElementById('right-panel').classList.remove('collapsed');
+  document.getElementById('panel-title').textContent =
+    which === 'dict' ? 'Dictionaries' : 'Settings';
+  renderPanel(which);
+}
+
+function closePanel() {
+  STATE.panel = null;
+  document.getElementById('right-panel').classList.add('collapsed');
+}
+
+function renderPanel(which) {
+  const body = document.getElementById('panel-body');
+  if (which === 'dict') {
+    const dicts = [
+      { key:'core', name:'CORE.txt', desc:'Default baseline. Human nature, instincts, broad permissions. Cannot be removed.' },
+      { key:'urbanwolf', name:'URBANWOLF.txt', desc:'Urban infrastructure lens. Civic-first, community-coded tone.' },
+      { key:'outlaw', name:'THEOUTLAW.txt', desc:'Radical privacy. Encrypts all output. Suppresses institutional nodes.' },
+    ];
+    body.innerHTML = dicts.map(d => `
+      <div class="dict-item" onclick="toggleDict('${d.key}')">
+        <div class="dict-check-row">
+          <div class="dict-check ${STATE.dicts[d.key]?'checked':''}" id="chk-${d.key}">${STATE.dicts[d.key]?'✓':''}</div>
+          <div class="dict-name-label">${d.name}</div>
+        </div>
+        <div class="dict-desc-sm">${d.desc}</div>
+      </div>
+    `).join('') + `<div style="padding:0.75rem 1rem;border-top:1px solid var(--border)">
+      <div style="font-size:0.72rem;color:var(--muted);line-height:1.6">Personal dictionary coming in full release. Submit custom functions via developer pipeline.</div>
+    </div>`;
+  } else {
+    const settings = [
+      { key:'voice', label:'Voice input (mic on)' },
+      { key:'suggestions', label:'Live suggestions dropdown' },
+      { key:'codeView', label:'Show STARDUST code view' },
+      { key:'autoChain', label:'Auto-chain suggestions' },
+    ];
+    body.innerHTML = settings.map(s => `
+      <div class="settings-row">
+        <span class="settings-label">${s.label}</span>
+        <button class="toggle ${STATE.settings[s.key]?'on':''}" id="tog-${s.key}" onclick="toggleSetting('${s.key}')"></button>
+      </div>
+    `).join('');
+  }
+}
+
+function toggleDict(key) {
+  if (key === 'core') return; // core always on
+  STATE.dicts[key] = !STATE.dicts[key];
+  renderPanel('dict');
+  addMessage('sage', `Dictionary ${STATE.dicts[key]?'activated':'deactivated'}: <span class="msg-cmd">${key}.txt</span>. Context reloaded.`);
+}
+
+function toggleSetting(key) {
+  STATE.settings[key] = !STATE.settings[key];
+  renderPanel('settings');
+  if (key === 'codeView') renderCodeView();
+}
+
+// ── SUGGESTIONS ───────────────────────────────────────────────────────────
+function updateSuggestions(val) {
+  if (!STATE.settings.suggestions || !val.trim()) {
+    hideSuggestions(); return;
+  }
+  const q = val.toLowerCase().trim();
+  const matches = SUGGESTIONS.filter(s =>
+    s.cmd.includes(q) || s.desc.toLowerCase().includes(q) || q.split(' ').every(w=>s.cmd.includes(w))
+  ).slice(0, 6);
+
+  if (!matches.length) { hideSuggestions(); return; }
+
+  const el = document.getElementById('suggestions');
+  el.innerHTML = matches.map((m,i) => `
+    <div class="sug-item" onclick="selectSuggestion('${m.cmd}')" data-idx="${i}">
+      <span class="sug-cmd">${m.cmd}</span>
+      <span class="sug-desc">${m.desc}</span>
+      <span class="sug-badge">${m.badge}</span>
+    </div>
+  `).join('');
+  el.classList.add('visible');
+  STATE.sugHighlight = -1;
+}
+
+function hideSuggestions() {
+  document.getElementById('suggestions').classList.remove('visible');
+  STATE.sugHighlight = -1;
+}
+
+function selectSuggestion(cmd) {
+  const box = document.getElementById('input-box');
+  box.value = cmd + ' ';
+  box.focus();
+  hideSuggestions();
+  document.getElementById('send-btn').disabled = false;
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────────
+function addMessage(role, html, isHtml=true) {
+  const empty = document.getElementById('empty-state');
+  if (empty) empty.remove();
+
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg';
+
+  if (role === 'sage') {
+    div.innerHTML = `
+      <div class="msg-avatar sage">S</div>
+      <div class="msg-content">
+        <div class="msg-name">Sage · STARDUST</div>
+        <div class="msg-text">${isHtml ? html : escHtml(html)}</div>
+      </div>`;
+  } else {
+    div.innerHTML = `
+      <div class="msg-avatar user">U</div>
+      <div class="msg-content">
+        <div class="msg-name">You</div>
+        <div class="msg-text user-text">${isHtml ? html : escHtml(html)}</div>
+      </div>`;
+  }
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function addLoadingMsg() {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.id = 'loading-msg';
+  div.innerHTML = `
+    <div class="msg-avatar sage">S</div>
+    <div class="msg-content">
+      <div class="msg-name">Sage · STARDUST</div>
+      <div class="msg-text"><div class="loading-dots"><span></span><span></span><span></span></div></div>
+    </div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeLoadingMsg() {
+  const el = document.getElementById('loading-msg');
+  if (el) el.remove();
+}
+
+function formatReply(text) {
+  // Format entry cards, code blocks, and AETs nicely
+  let html = text
+    .replace(/\[([A-Z ·.]+)\]/g, '<div class="entry-tag">$1</div>')
+    .replace(/```([\s\S]*?)```/g, '<div class="msg-tree">$1</div>')
+    .replace(/`([^`]+)`/g, '<span class="msg-cmd">$1</span>')
+    .replace(/WRITE\(|ENCRYPT\(|STORE\(|READ\(|SCHEDULE\(|FIND\(|DONATE\(|SEND\(/g, m => `<span style="color:var(--gold-soft)">${m}</span>`)
+    .replace(/\n/g, '<br>');
+  return html;
+}
+
+async function sendMessage() {
+  const box = document.getElementById('input-box');
+  const val = box.value.trim();
+  if (!val) return;
+
+  hideSuggestions();
+  box.value = '';
+  box.style.height = 'auto';
+  document.getElementById('send-btn').disabled = true;
+
+  addMessage('user', `<span class="msg-cmd">${escHtml(val)}</span>`);
+
+  // Auto-navigate based on command prefix
+  autoNavigate(val);
+
+  addLoadingMsg();
+
+  try {
+    const reply = await callSage(val);
+    removeLoadingMsg();
+    const msgEl = addMessage('sage', formatReply(reply));
+
+    // Store entry if private domain
+    storeEntryIfPrivate(val, reply);
+    if (STATE.view === 'app') renderAppGrid();
+  } catch(e) {
+    removeLoadingMsg();
+    addMessage('sage', 'Connection error. Check your network and try again.');
+  }
+}
+
+function autoNavigate(cmd) {
+  const c = cmd.toLowerCase();
+  if (c.startsWith('prv diary')) navTo('prv_diary');
+  else if (c.startsWith('prv lust')) navTo('prv_lust');
+  else if (c.startsWith('prv drm')) navTo('prv_drm');
+  else if (c.startsWith('prv trma')) navTo('prv_trma');
+  else if (c.startsWith('prv rage')) navTo('prv_rage');
+  else if (c.startsWith('prv blf')) navTo('prv_blf');
+  else if (c.startsWith('prv lgcy')) navTo('prv_lgcy');
+  else if (c.startsWith('prv')) navTo('prv');
+  else if (c.startsWith('hm util')) navTo('hm_util');
+  else if (c.startsWith('hm rsrc')) navTo('hm_rsrc');
+  else if (c.startsWith('hm mnt')) navTo('hm_mnt');
+  else if (c.startsWith('hm fin')) navTo('hm_fin');
+  else if (c.startsWith('hm')) navTo('hm');
+  else if (c.startsWith('soc frnd')) navTo('soc_frnd');
+  else if (c.startsWith('soc dat')) navTo('soc_dat');
+  else if (c.startsWith('soc')) navTo('soc');
+  else if (c.startsWith('pln goal')) navTo('pln_goal');
+  else if (c.startsWith('pln evnt')) navTo('pln_evnt');
+  else if (c.startsWith('pln place')) navTo('pln_place');
+  else if (c.startsWith('pln idea')) navTo('pln_idea');
+  else if (c.startsWith('pln trvl')) navTo('pln_trvl');
+  else if (c.startsWith('pln mlstn')) navTo('pln_mlstn');
+  else if (c.startsWith('pln')) navTo('pln');
+  else if (c.startsWith('knw')) navTo('knw');
+}
+
+function storeEntryIfPrivate(cmd, reply) {
+  const c = cmd.toLowerCase();
+  let nodeKey = null;
+  if (c.startsWith('prv diary')) nodeKey = 'prv_diary';
+  else if (c.startsWith('prv lust')) nodeKey = 'prv_lust';
+  else if (c.startsWith('prv drm')) nodeKey = 'prv_drm';
+  else if (c.startsWith('pln goal')) nodeKey = 'pln_goal';
+  else if (c.startsWith('pln evnt')) nodeKey = 'pln_evnt';
+  else if (c.startsWith('pln place')) nodeKey = 'pln_place';
+  else if (c.startsWith('hm util')) nodeKey = 'hm_util';
+  else if (c.startsWith('soc frnd')) nodeKey = 'soc_frnd';
+
+  if (nodeKey) {
+    if (!STATE.entries[nodeKey]) STATE.entries[nodeKey] = [];
+    const words = cmd.split(' ').slice(2).join(' ');
+    STATE.entries[nodeKey].unshift({
+      timestamp: new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
+      preview: words.slice(0, 60) + (words.length > 60 ? '…' : ''),
+    });
+  }
+}
+
+// ── INPUT HANDLING ─────────────────────────────────────────────────────────
+function handleInput(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  document.getElementById('send-btn').disabled = !el.value.trim();
+  updateSuggestions(el.value);
+}
+
+function handleKey(e) {
+  const sugs = document.getElementById('suggestions');
+  const items = sugs.querySelectorAll('.sug-item');
+
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (STATE.sugHighlight >= 0 && items[STATE.sugHighlight]) {
+      items[STATE.sugHighlight].click();
+    } else {
+      sendMessage();
+    }
+  } else if (e.key === 'Tab' && sugs.classList.contains('visible')) {
+    e.preventDefault();
+    STATE.sugHighlight = (STATE.sugHighlight + 1) % items.length;
+    items.forEach((item,i) => item.classList.toggle('highlighted', i===STATE.sugHighlight));
+  } else if (e.key === 'Escape') {
+    hideSuggestions();
+    document.getElementById('input-box').value = '';
+    document.getElementById('send-btn').disabled = true;
+  }
+}
+
+function useChip(cmd) {
+  const box = document.getElementById('input-box');
+  box.value = cmd;
+  box.focus();
+  document.getElementById('send-btn').disabled = false;
+  handleInput(box);
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+function init() {
+  renderTree();
+  renderBreadcrumb();
+  renderCodeView();
+  setView('chat');
+
+  // Initial greeting
+  setTimeout(() => {
+    addMessage('sage', `Welcome. I am <strong style="color:var(--gold-soft)">Sage</strong>, running on STARDUST.<br><br>
+Your private domain is encrypted on this device. No server holds your keys. Type the shortest abbreviation of what you want — I resolve, chain, and execute.<br><br>
+Try <span class="msg-cmd">prv diary wrt</span> to write your first entry, or tap a quick command below.`);
+  }, 400);
+}
+
+init();
+</script>
+</body>
+</html>
