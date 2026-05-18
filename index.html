@@ -3,1146 +3,1513 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sage · Phase 1 Demo</title>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Sage · STARDUST</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
 :root{
-  --bg:        #08080A;
-  --surface:   #0F0F12;
-  --card:      #161619;
-  --border:    #252529;
-  --border2:   #333338;
-  --gold:      #C9A84C;
-  --gold-dim:  #6B5520;
-  --gold-soft: #E8C97A;
-  --teal:      #0D9488;
-  --teal-lt:   #5EEAD4;
-  --white:     #F2F2F4;
-  --body:      #C8C8D0;
-  --muted:     #88889A;
-  --danger:    #E05555;
+  --bg:#08080A;--surface:#0F0F12;--card:#161619;
+  --border:#252529;--border2:#333338;
+  --gold:#C9A84C;--gold-dim:#6B5520;--gold-soft:#E8C97A;
+  --teal:#0D9488;--teal-lt:#5EEAD4;
+  --violet:#7C3AED;--violet-lt:#C4B5FD;
+  --amber:#D97706;--amber-lt:#FCD34D;
+  --rose:#E11D48;--rose-lt:#FDA4AF;
+  --sky:#0EA5E9;--sky-lt:#BAE6FD;
+  --emerald:#059669;--emerald-lt:#6EE7B7;
+  --white:#F2F2F4;--body:#C8C8D0;--muted:#88889A;
 }
-
 html,body{height:100%;overflow:hidden}
-body{
-  background:var(--bg);
-  color:var(--white);
-  font-family:'DM Sans',sans-serif;
-  font-weight:400;
-  display:flex;
-  flex-direction:column;
-}
+body{background:var(--bg);color:var(--white);font-family:"DM Sans",sans-serif;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+@keyframes dot{0%,100%{opacity:.3;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
+@keyframes mIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 8px rgba(124,58,237,.25)}50%{box-shadow:0 0 20px rgba(124,58,237,.5)}}
+@keyframes popIn{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
-/* ── TOP BAR ── */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 1.25rem;height:48px;
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-  z-index:50;
-}
-.topbar-logo{
-  font-family:'EB Garamond',serif;
-  font-size:1.25rem;font-weight:700;
-  letter-spacing:0.12em;color:var(--white);
-}
-.topbar-logo span{color:var(--gold)}
-.topbar-sub{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.6rem;letter-spacing:0.18em;
-  color:var(--gold-dim);text-transform:uppercase;
-  margin-left:0.75rem;
-}
-.topbar-right{display:flex;align-items:center;gap:0.5rem}
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 1rem;height:46px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.logo{font-family:"EB Garamond",serif;font-size:1.2rem;font-weight:700;letter-spacing:.12em}
+.logo span{color:var(--gold)}
+.logo-sub{font-family:"JetBrains Mono",monospace;font-size:.5rem;letter-spacing:.18em;color:var(--gold-dim);text-transform:uppercase;margin-left:.6rem}
+.vtog{display:flex;background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.vbtn{padding:.26rem .65rem;font-family:"JetBrains Mono",monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:none;border:none;cursor:pointer}
+.vbtn.active{background:var(--gold-dim);color:var(--gold-soft)}
+.ibtn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem}
+.ibtn.active{border-color:var(--gold-dim);color:var(--gold-soft)}
+.app-body{flex:1;display:flex;overflow:hidden}
 
-/* view toggle */
-.view-toggle{
-  display:flex;background:var(--card);
-  border:1px solid var(--border);border-radius:6px;
-  overflow:hidden;
-}
-.view-btn{
-  padding:0.3rem 0.75rem;
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.65rem;letter-spacing:0.1em;
-  text-transform:uppercase;color:var(--muted);
-  background:none;border:none;cursor:pointer;
-  transition:all 0.15s;
-}
-.view-btn.active{background:var(--gold-dim);color:var(--gold-soft)}
-.view-btn:hover:not(.active){color:var(--white)}
+/* SIDEBAR */
+.sidebar{width:210px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sb-sec{padding:.45rem .9rem .28rem;font-family:"JetBrains Mono",monospace;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;border-bottom:1px solid var(--border);flex-shrink:0}
+.tree-scroll{flex:1;overflow-y:auto;padding:.3rem 0}
+.tnode{display:flex;align-items:center;gap:.3rem;padding:.24rem .9rem;cursor:pointer;font-size:.74rem;color:var(--body);border-left:2px solid transparent;user-select:none;transition:background .1s}
+.tnode:hover{background:rgba(201,168,76,.05);color:var(--white)}
+.tnode.active{border-left-color:var(--gold);color:var(--gold-soft);background:rgba(201,168,76,.07)}
+.tnode.d1{padding-left:.9rem;font-size:.78rem;font-weight:500}
+.tnode.d2{padding-left:1.5rem;font-size:.73rem}
+.tnode.d3{padding-left:2.1rem;font-size:.69rem;color:var(--muted)}
+.tnode.d3:hover{color:var(--body)}.tnode.d3.active{color:var(--gold-soft)}
+.ncmd{font-family:"JetBrains Mono",monospace;font-size:.48rem;margin-left:auto;opacity:.55}
+.vote-bar{display:none;align-items:center;gap:2px;margin-left:auto}
+.tnode:hover .vote-bar,.tnode.active .vote-bar{display:flex}
+.tnode:hover .ncmd,.tnode.active .ncmd{display:none}
+.vbtn2{background:none;border:none;cursor:pointer;font-size:.58rem;color:var(--muted);padding:0 2px;line-height:1}
+.vbtn2.up-on{color:var(--teal-lt)}.vbtn2.dn-on{color:#FDA4AF}
+.vscore{font-family:"JetBrains Mono",monospace;font-size:.5rem;color:var(--muted);min-width:14px;text-align:center}
+.vscore.pos{color:var(--teal-lt)}.vscore.neg{color:#FDA4AF}
 
-.icon-btn{
-  width:32px;height:32px;border-radius:6px;
-  border:1px solid var(--border);background:var(--card);
-  color:var(--muted);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.85rem;transition:all 0.15s;
-}
-.icon-btn:hover{border-color:var(--border2);color:var(--white)}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.breadcrumb{padding:.38rem 1rem;background:var(--surface);border-bottom:1px solid var(--border);font-family:"JetBrains Mono",monospace;font-size:.58rem;color:var(--muted);display:flex;align-items:center;gap:.3rem;flex-shrink:0;flex-wrap:wrap}
+.bc{color:var(--body);cursor:pointer}.bc:hover{color:var(--gold)}.bc.active{color:var(--gold-soft)}.bc-arr{color:var(--border2)}
+.code-view{background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 1rem;font-family:"JetBrains Mono",monospace;font-size:.62rem;color:var(--body);flex-shrink:0;max-height:105px;overflow-y:auto}
+.cv-p{color:var(--gold)}.cv-t{color:var(--teal-lt)}.cv-d{color:var(--muted);margin-top:.15rem;white-space:pre}
 
-/* ── LAYOUT ── */
-.app-body{
-  flex:1;display:flex;overflow:hidden;
-}
+/* APP VIEW */
+.agv{overflow-y:auto;padding:1rem;display:none;max-height:42vh;border-bottom:1px solid var(--border);flex-shrink:0}.agv.on{display:block}
+.agv-title{font-family:"EB Garamond",serif;font-size:1.3rem;font-weight:700;margin-bottom:.12rem}
+.agv-sub{font-family:"JetBrains Mono",monospace;font-size:.62rem;color:var(--teal-lt);margin-bottom:.9rem}
+.box-grid{display:flex;flex-wrap:wrap;gap:.42rem;margin-bottom:.75rem}
+.bbox{background:var(--card);border:1px solid var(--border);border-top-width:2px;border-radius:6px;padding:.48rem .72rem;cursor:pointer;min-width:86px;transition:all .12s}
+.bbox:hover{border-color:var(--border2);transform:translateY(-1px)}
+.bl{font-size:.75rem;font-weight:500;color:var(--white)}
+.bc2{font-family:"JetBrains Mono",monospace;font-size:.52rem;margin-top:.1rem}
+.bct{font-size:.6rem;color:var(--muted);margin-top:.08rem}
+.entry-sec{border-top:1px solid var(--border);padding-top:.85rem;margin-top:.5rem}
+.entry-sec-title{font-family:"JetBrains Mono",monospace;font-size:.57rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.6rem}
+.ecard{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.68rem .92rem;margin-bottom:.45rem}
+.ets{font-family:"JetBrains Mono",monospace;font-size:.54rem;color:var(--muted);margin-bottom:.25rem}
+.etag2{font-family:"JetBrains Mono",monospace;font-size:.54rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.25rem}
+.ebody{font-size:.81rem;color:var(--body);line-height:1.65}
 
-/* ── LEFT SIDEBAR ── */
-.sidebar{
-  width:220px;flex-shrink:0;
-  background:var(--surface);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  overflow:hidden;
-}
-.sidebar-section{
-  padding:0.75rem 1rem 0.5rem;
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.6rem;letter-spacing:0.15em;
-  text-transform:uppercase;color:var(--gold-dim);
-  border-bottom:1px solid var(--border);
-}
-.tree-list{flex:1;overflow-y:auto;padding:0.5rem 0}
-.tree-list::-webkit-scrollbar{width:3px}
-.tree-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+/* CHAT */
+.chat-view{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.75rem}
+.msg{display:flex;gap:.52rem;align-items:flex-start;animation:mIn .2s ease}
+.ava{width:23px;height:23px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0;font-family:"EB Garamond",serif}
+.ava.sage{background:var(--gold-dim);color:var(--gold-soft)}.ava.user{background:var(--border2);color:var(--body)}
+.ava.mut{background:rgba(124,58,237,.3);color:var(--violet-lt)}
+.ava.civ{background:rgba(14,165,233,.3);color:var(--sky-lt)}
+.ava.com{background:rgba(217,119,6,.3);color:var(--amber-lt)}
+.ava.glb{background:rgba(5,150,105,.3);color:var(--emerald-lt)}
+.ava.uni{background:rgba(99,102,241,.3);color:#C7D2FE}
+.mcon{flex:1;padding-top:.04rem}
+.mname{font-family:"JetBrains Mono",monospace;font-size:.49rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.18rem}
+.mtxt{font-size:.82rem;color:var(--body);line-height:1.7}.mtxt.u{color:var(--white)}
+.mcmd{font-family:"JetBrains Mono",monospace;font-size:.72rem;color:var(--teal-lt);background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.2);border-radius:4px;padding:.04rem .28rem;display:inline-block}
 
-.tree-node{
-  display:flex;align-items:center;gap:0.4rem;
-  padding:0.3rem 1rem;cursor:pointer;
-  font-size:0.8rem;color:var(--body);
-  transition:all 0.12s;border-left:2px solid transparent;
-  user-select:none;
-}
-.tree-node:hover{background:rgba(201,168,76,0.05);color:var(--white)}
-.tree-node.active{
-  background:rgba(201,168,76,0.08);
-  border-left-color:var(--gold);color:var(--gold-soft);
-}
-.tree-node.child{padding-left:1.75rem;font-size:0.75rem}
-.tree-node.grandchild{padding-left:2.5rem;font-size:0.72rem;color:var(--muted)}
-.tree-node.grandchild:hover{color:var(--body)}
-.tree-node.grandchild.active{color:var(--gold-soft)}
-.node-icon{font-size:0.7rem;opacity:0.7}
-.node-cmd{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.6rem;color:var(--teal);
-  margin-left:auto;opacity:0.7;
-}
+/* CONFIRMATION BOX */
+.conf-box{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--teal);border-radius:8px;padding:.75rem 1rem;margin-top:.55rem;animation:popIn .25s ease}
+.conf-title{font-family:"JetBrains Mono",monospace;font-size:.57rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-lt);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.conf-row{display:flex;gap:.5rem;align-items:baseline;margin-bottom:.22rem;font-size:.8rem}
+.conf-key{font-family:"JetBrains Mono",monospace;font-size:.6rem;color:var(--muted);min-width:90px;flex-shrink:0}
+.conf-val{color:var(--white)}
+.conf-node{font-family:"JetBrains Mono",monospace;font-size:.58rem;color:var(--amber-lt);opacity:.75;margin-top:.4rem;display:flex;align-items:center;gap:.3rem}
 
-/* ── MAIN AREA ── */
-.main{
-  flex:1;display:flex;flex-direction:column;overflow:hidden;
-}
+/* VIEW LIST BOX */
+.list-box{background:var(--card);border:1px solid var(--border2);border-radius:8px;margin-top:.55rem;overflow:hidden;animation:popIn .25s ease}
+.list-header{padding:.55rem 1rem;background:rgba(201,168,76,.07);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.list-title{font-family:"JetBrains Mono",monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-soft)}
+.list-count{font-family:"JetBrains Mono",monospace;font-size:.57rem;color:var(--muted)}
+.list-row{display:flex;align-items:center;padding:.45rem 1rem;border-bottom:1px solid var(--border);font-size:.8rem;gap:.5rem}
+.list-row:last-child{border-bottom:none}
+.list-row:hover{background:rgba(255,255,255,.02)}
+.list-idx{font-family:"JetBrains Mono",monospace;font-size:.55rem;color:var(--muted);min-width:20px}
+.list-main{flex:1;color:var(--white)}
+.list-sub{font-family:"JetBrains Mono",monospace;font-size:.58rem;color:var(--muted)}
+.list-badge{font-family:"JetBrains Mono",monospace;font-size:.55rem;padding:.06rem .32rem;border-radius:3px;border:1px solid;flex-shrink:0}
+.badge-active{color:var(--teal-lt);border-color:rgba(13,148,136,.4);background:rgba(13,148,136,.08)}
+.badge-inactive{color:var(--amber-lt);border-color:rgba(217,119,6,.3);background:rgba(217,119,6,.06)}
+.badge-avail{color:var(--emerald-lt);border-color:rgba(5,150,105,.4);background:rgba(5,150,105,.08)}
+.badge-taken{color:var(--muted);border-color:var(--border2);background:transparent}
+.badge-broken{color:var(--rose-lt);border-color:rgba(225,29,72,.3);background:rgba(225,29,72,.06)}
 
-/* ── TREE PATH BREADCRUMB ── */
-.breadcrumb{
-  padding:0.5rem 1.25rem;
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.7rem;color:var(--muted);
-  display:flex;align-items:center;gap:0.4rem;
-  flex-shrink:0;
-}
-.bc-seg{color:var(--body);cursor:pointer}
-.bc-seg:hover{color:var(--gold)}
-.bc-seg.active{color:var(--gold-soft)}
-.bc-arrow{color:var(--border2)}
+/* QUOTE/GRATITUDE BOX */
+.quote-box{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--emerald);border-radius:8px;padding:.85rem 1rem;margin-top:.55rem;animation:popIn .25s ease}
+.quote-text{font-family:"EB Garamond",serif;font-size:1rem;font-style:italic;color:var(--white);line-height:1.65;margin-bottom:.45rem}
+.quote-attr{font-family:"JetBrains Mono",monospace;font-size:.6rem;color:var(--muted)}
 
-/* ── STARDUST CODE VIEW ── */
-.code-view{
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  padding:0.75rem 1.25rem;
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.72rem;
-  color:var(--body);
-  flex-shrink:0;
-  max-height:140px;
-  overflow-y:auto;
-  display:none;
-}
-.code-view.visible{display:block}
-.code-prompt{color:var(--gold)}
-.code-tree{color:var(--teal-lt);margin-top:0.25rem;white-space:pre}
-.code-dim{color:var(--muted)}
+/* SUGGESTIONS */
+.sugs{background:var(--card);border:1px solid var(--border2);border-radius:8px;overflow:hidden;margin:0 1rem .32rem;display:none}
+.sugs.on{display:block}
+.sug{display:flex;align-items:center;justify-content:space-between;padding:.38rem .85rem;cursor:pointer;font-size:.73rem;border-bottom:1px solid var(--border)}
+.sug:last-child{border-bottom:none}.sug:hover,.sug.hi{background:rgba(201,168,76,.07)}
+.scmd{font-family:"JetBrains Mono",monospace;font-size:.68rem}
+.sdesc{color:var(--muted);font-size:.67rem}
+.sbadge{font-family:"JetBrains Mono",monospace;font-size:.52rem;color:var(--gold);background:rgba(201,168,76,.1);border:1px solid var(--gold-dim);border-radius:3px;padding:.04rem .27rem}
 
-/* ── APP GRID VIEW ── */
-.app-grid-view{
-  flex:1;overflow:auto;padding:1.25rem;
-  display:none;
-}
-.app-grid-view.visible{display:block}
-.grid-title{
-  font-family:'EB Garamond',serif;
-  font-size:1.4rem;font-weight:700;
-  color:var(--white);margin-bottom:0.25rem;
-}
-.grid-subtitle{font-size:0.8rem;color:var(--muted);margin-bottom:1.25rem}
-.box-grid{
-  display:flex;flex-wrap:wrap;gap:0.6rem;
-  align-items:flex-start;
-}
-.box-node{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:0.6rem 0.85rem;
-  cursor:pointer;
-  transition:all 0.15s;
-  min-width:100px;
-}
-.box-node:hover{border-color:var(--border2);transform:translateY(-1px)}
-.box-node.selected{border-color:var(--gold);background:rgba(201,168,76,0.06)}
-.box-node.parent-box{
-  border-top:2px solid var(--teal);
-  min-width:130px;
-}
-.box-node.parent-box.selected{border-top-color:var(--gold)}
-.box-label{font-size:0.8rem;font-weight:500;color:var(--white)}
-.box-cmd{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.6rem;color:var(--teal-lt);
-  margin-top:0.2rem;
-}
-.box-count{font-size:0.7rem;color:var(--muted);margin-top:0.15rem}
-.grid-arrow{
-  color:var(--border2);font-size:1rem;
-  display:flex;align-items:center;
-  align-self:center;
-}
-.child-grid{
-  display:flex;flex-wrap:wrap;gap:0.5rem;
-  margin-top:0.75rem;padding-top:0.75rem;
-  border-top:1px solid var(--border);
-  width:100%;
-}
+/* INPUT */
+.inp-wrap{padding:.58rem 1rem .72rem;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+.inp-row{display:flex;gap:.4rem;align-items:flex-end}
+.ibox{flex:1;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:.52rem .82rem;font-family:"JetBrains Mono",monospace;font-size:.78rem;color:var(--teal-lt);resize:none;outline:none;min-height:35px;max-height:98px;transition:border-color .15s;line-height:1.5;direction:ltr;text-align:left;unicode-bidi:plaintext}
+.ibox::placeholder{color:var(--muted);font-family:"DM Sans",sans-serif;font-size:.74rem}
+.ibox:focus{border-color:var(--gold-dim)}
+.sbtn{width:35px;height:35px;border-radius:8px;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:.88rem;flex-shrink:0}
+.sbtn:hover{background:var(--gold-soft)}.sbtn:disabled{background:var(--border);cursor:default;color:var(--muted)}
+.ihint{font-family:"JetBrains Mono",monospace;font-size:.5rem;color:var(--muted);margin-top:.28rem}
 
-/* ── CHAT VIEW ── */
-.chat-view{
-  flex:1;overflow:hidden;display:flex;flex-direction:column;
-}
-.chat-messages{
-  flex:1;overflow-y:auto;padding:1.25rem;
-  display:flex;flex-direction:column;gap:1rem;
-}
-.chat-messages::-webkit-scrollbar{width:3px}
-.chat-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+/* RIGHT PANEL */
+.rpanel{width:0;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .2s}
+.rpanel.open{width:252px}
+.ph{padding:.55rem .85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ptitle{font-family:"JetBrains Mono",monospace;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold)}
+.pclose{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem}
+.pbody{flex:1;overflow-y:auto;padding:.5rem 0}
+.ditem{padding:.55rem .85rem;border-bottom:1px solid var(--border);cursor:pointer}
+.ditem:last-child{border-bottom:none}
+.dchk-row{display:flex;align-items:center;gap:.42rem;margin-bottom:.22rem}
+.dchk{width:13px;height:13px;border-radius:3px;border:1px solid var(--border2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:.5rem;flex-shrink:0}
+.dchk.on{background:var(--teal);border-color:var(--teal);color:var(--bg)}
+.dchk.locked{background:var(--gold-dim);border-color:var(--gold-dim);color:var(--bg);cursor:default}
+.dnm{font-family:"JetBrains Mono",monospace;font-size:.64rem;letter-spacing:.07em}
+.ddesc{font-size:.67rem;color:var(--muted);line-height:1.5;padding-left:1.16rem}
+.srow{padding:.48rem .85rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);font-size:.74rem}
+.srow:last-child{border-bottom:none}.slbl{color:var(--body)}
+.tog{width:27px;height:14px;border-radius:8px;background:var(--teal);border:none;cursor:pointer;position:relative;flex-shrink:0}
+.tog::after{content:"";position:absolute;top:2px;right:2px;width:10px;height:10px;border-radius:50%;background:var(--white)}
+.try-me{display:flex;align-items:center;gap:.42rem;margin:.62rem .85rem .28rem;padding:.45rem .8rem;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.4);border-radius:8px;cursor:pointer;animation:glow 2.2s ease-in-out infinite}
+.try-text{font-size:.68rem;font-weight:500;color:var(--violet-lt);line-height:1.38}
+.try-sub{font-size:.58rem;color:var(--muted)}
 
-.msg{display:flex;gap:0.75rem;align-items:flex-start;animation:msgIn 0.25s ease}
-@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.msg-avatar{
-  width:28px;height:28px;border-radius:6px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.7rem;font-weight:700;flex-shrink:0;
-  font-family:'EB Garamond',serif;
-}
-.msg-avatar.sage{background:var(--gold-dim);color:var(--gold-soft)}
-.msg-avatar.user{background:var(--border2);color:var(--body)}
-.msg-content{flex:1;padding-top:0.1rem}
-.msg-name{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.6rem;letter-spacing:0.1em;
-  text-transform:uppercase;color:var(--muted);
-  margin-bottom:0.3rem;
-}
-.msg-text{font-size:0.875rem;color:var(--body);line-height:1.7}
-.msg-text.user-text{color:var(--white)}
-.msg-cmd{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.78rem;color:var(--teal-lt);
-  background:rgba(13,148,136,0.08);
-  border:1px solid rgba(13,148,136,0.2);
-  border-radius:4px;padding:0.1rem 0.4rem;
-  display:inline-block;
-}
-.msg-tree{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.72rem;
-  background:var(--card);border:1px solid var(--border);
-  border-radius:6px;padding:0.75rem 1rem;
-  margin-top:0.5rem;color:var(--teal-lt);
-  white-space:pre;overflow-x:auto;
-}
-.entry-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:8px;padding:1rem 1.1rem;
-  margin-top:0.5rem;
-}
-.entry-tag{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.6rem;color:var(--gold);
-  letter-spacing:0.1em;text-transform:uppercase;
-  margin-bottom:0.4rem;
-}
-.entry-text{font-size:0.875rem;color:var(--body);line-height:1.75}
-.entry-meta{
-  font-size:0.72rem;color:var(--muted);margin-top:0.5rem;
-  font-family:'JetBrains Mono',monospace;
-}
-
-/* suggestions dropdown */
-.suggestions{
-  background:var(--card);
-  border:1px solid var(--border2);
-  border-radius:8px;
-  overflow:hidden;
-  margin:0 1.25rem 0.5rem;
-  display:none;
-}
-.suggestions.visible{display:block}
-.sug-item{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0.5rem 1rem;cursor:pointer;
-  transition:background 0.1s;font-size:0.8rem;
-}
-.sug-item:hover,.sug-item.highlighted{background:rgba(201,168,76,0.08)}
-.sug-item:not(:last-child){border-bottom:1px solid var(--border)}
-.sug-cmd{font-family:'JetBrains Mono',monospace;color:var(--teal-lt);font-size:0.78rem}
-.sug-desc{color:var(--muted);font-size:0.75rem}
-.sug-badge{
-  font-family:'JetBrains Mono',monospace;font-size:0.6rem;
-  color:var(--gold);background:rgba(201,168,76,0.1);
-  border:1px solid var(--gold-dim);border-radius:3px;
-  padding:0.1rem 0.35rem;
-}
-
-/* ── INPUT AREA ── */
-.input-wrap{
-  padding:0.75rem 1.25rem 1rem;
-  background:var(--surface);
-  border-top:1px solid var(--border);
-  flex-shrink:0;
-}
-.input-row{display:flex;gap:0.5rem;align-items:flex-end}
-.input-box{
-  flex:1;background:var(--card);
-  border:1px solid var(--border2);border-radius:8px;
-  padding:0.65rem 1rem;
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.85rem;color:var(--teal-lt);
-  resize:none;outline:none;
-  min-height:40px;max-height:120px;
-  transition:border-color 0.15s;
-  line-height:1.5;
-}
-.input-box::placeholder{color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.82rem}
-.input-box:focus{border-color:var(--gold-dim)}
-.send-btn{
-  width:40px;height:40px;border-radius:8px;
-  background:var(--gold);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  color:var(--bg);font-size:1rem;
-  transition:all 0.15s;flex-shrink:0;
-}
-.send-btn:hover{background:var(--gold-soft)}
-.send-btn:disabled{background:var(--border);cursor:default;color:var(--muted)}
-.input-hint{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.6rem;color:var(--muted);
-  margin-top:0.4rem;letter-spacing:0.05em;
-}
-
-/* ── RIGHT PANEL (dict / settings) ── */
-.right-panel{
-  width:260px;flex-shrink:0;
-  background:var(--surface);
-  border-left:1px solid var(--border);
-  display:flex;flex-direction:column;
-  overflow:hidden;
-  transition:width 0.2s ease;
-}
-.right-panel.collapsed{width:0;border-left:none}
-.panel-header{
-  padding:0.75rem 1rem;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;
-}
-.panel-title{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.65rem;letter-spacing:0.15em;
-  text-transform:uppercase;color:var(--gold);
-}
-.panel-close{
-  background:none;border:none;color:var(--muted);
-  cursor:pointer;font-size:0.9rem;
-  transition:color 0.15s;
-}
-.panel-close:hover{color:var(--white)}
-.panel-body{flex:1;overflow-y:auto;padding:0.75rem 0}
-.panel-body::-webkit-scrollbar{width:3px}
-.panel-body::-webkit-scrollbar-thumb{background:var(--border2)}
-
-.dict-item{
-  padding:0.75rem 1rem;
-  border-bottom:1px solid var(--border);
-  cursor:pointer;
-}
-.dict-item:last-child{border-bottom:none}
-.dict-check-row{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.35rem}
-.dict-check{
-  width:16px;height:16px;border-radius:3px;
-  border:1px solid var(--border2);
-  background:var(--card);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:all 0.15s;
-}
-.dict-check.checked{background:var(--teal);border-color:var(--teal);color:var(--bg);font-size:0.6rem}
-.dict-name-label{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.72rem;color:var(--gold);letter-spacing:0.08em;
-}
-.dict-desc-sm{font-size:0.75rem;color:var(--muted);line-height:1.55;padding-left:1.4rem}
-
-.settings-row{
-  padding:0.6rem 1rem;
-  display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--border);font-size:0.8rem;
-}
-.settings-row:last-child{border-bottom:none}
-.settings-label{color:var(--body)}
-.toggle{
-  width:32px;height:18px;border-radius:9px;
-  background:var(--border2);border:none;cursor:pointer;
-  position:relative;transition:background 0.2s;flex-shrink:0;
-}
-.toggle.on{background:var(--teal)}
-.toggle::after{
-  content:'';position:absolute;
-  top:2px;left:2px;width:14px;height:14px;
-  border-radius:50%;background:var(--white);
-  transition:transform 0.2s;
-}
-.toggle.on::after{transform:translateX(14px)}
-
-/* loading dots */
-.loading-dots span{
-  display:inline-block;width:5px;height:5px;
-  border-radius:50%;background:var(--gold);
-  margin:0 2px;
-  animation:dot 1.2s ease-in-out infinite;
-}
-.loading-dots span:nth-child(2){animation-delay:0.2s}
-.loading-dots span:nth-child(3){animation-delay:0.4s}
-@keyframes dot{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
-
-/* empty state */
-.empty-state{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  text-align:center;padding:2rem;
-  color:var(--muted);
-}
-.empty-logo{
-  font-family:'EB Garamond',serif;
-  font-size:3rem;font-weight:700;
-  letter-spacing:0.1em;color:var(--border2);
-  margin-bottom:0.5rem;
-}
-.empty-hint{font-size:0.8rem;line-height:1.7;max-width:320px}
-.quick-chip{
-  display:inline-block;
-  margin:0.25rem;padding:0.3rem 0.75rem;
-  background:var(--card);border:1px solid var(--border2);
-  border-radius:20px;font-family:'JetBrains Mono',monospace;
-  font-size:0.7rem;color:var(--teal-lt);cursor:pointer;
-  transition:all 0.15s;
-}
-.quick-chip:hover{border-color:var(--teal);color:var(--white)}
+/* EMPTY */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;color:var(--muted)}
+.elogo{font-family:"EB Garamond",serif;font-size:2.4rem;font-weight:700;letter-spacing:.1em;color:var(--border2);margin-bottom:.32rem}
+.chip{display:inline-block;margin:.14rem;padding:.2rem .58rem;background:var(--card);border:1px solid var(--border2);border-radius:20px;font-family:"JetBrains Mono",monospace;font-size:.58rem;cursor:pointer;color:var(--teal-lt);transition:all .15s}
+.chip:hover{border-color:var(--teal);color:var(--white)}
+.chip.vc{color:var(--violet-lt)}.chip.cy{color:var(--sky-lt)}.chip.co{color:var(--amber-lt)}.chip.gl{color:var(--emerald-lt)}
+.dots{display:flex;gap:3px;padding-top:4px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gold);display:inline-block}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="topbar">
   <div style="display:flex;align-items:center">
-    <div class="topbar-logo">S<span>AGE</span></div>
-    <div class="topbar-sub">STARDUST · Phase 1</div>
+    <div class="logo">S<span>AGE</span></div>
+    <div class="logo-sub">STARDUST</div>
   </div>
-  <div style="display:flex;align-items:center;gap:0.75rem">
-    <div class="view-toggle">
-      <button class="view-btn active" id="btn-chat" onclick="setView('chat')">Chat</button>
-      <button class="view-btn" id="btn-app" onclick="setView('app')">App</button>
+  <div style="display:flex;align-items:center;gap:.5rem">
+    <div class="vtog">
+      <button class="vbtn active" id="btn-chat" onclick="setView('chat')">Chat</button>
+      <button class="vbtn" id="btn-app" onclick="setView('app')">App</button>
     </div>
-    <button class="icon-btn" id="dict-toggle-btn" onclick="togglePanel('dict')" title="Dictionaries">📖</button>
-    <button class="icon-btn" id="settings-toggle-btn" onclick="togglePanel('settings')" title="Settings">⚙</button>
+    <button class="ibtn" id="dict-btn" onclick="togglePanel('dict')">&#x1F4D6;</button>
+    <button class="ibtn" id="set-btn" onclick="togglePanel('settings')">&#x2699;</button>
   </div>
 </div>
 
-<!-- APP BODY -->
 <div class="app-body">
-
-  <!-- LEFT SIDEBAR: Tree Navigation -->
   <div class="sidebar">
-    <div class="sidebar-section">STARDUST Tree</div>
-    <div class="tree-list" id="tree-list"></div>
+    <div class="sb-sec" style="color:var(--gold-dim)">&#x2736; Self</div>
+    <div class="tree-scroll" id="tree-list"></div>
   </div>
-
-  <!-- MAIN -->
   <div class="main">
-
-    <!-- BREADCRUMB -->
-    <div class="breadcrumb" id="breadcrumb">
-      <span class="bc-seg active" onclick="navTo('root')">~</span>
-    </div>
-
-    <!-- CODE VIEW (STARDUST view) -->
+    <div class="breadcrumb" id="breadcrumb"></div>
     <div class="code-view" id="code-view">
-      <span class="code-prompt">sage › </span><span id="code-context" class="code-tree">root</span>
-      <div id="code-tree-display" class="code-dim" style="margin-top:0.35rem"></div>
+      <span class="cv-p">sage &rsaquo; </span><span id="cv-ctx" class="cv-t">~</span>
+      <div id="cv-tree" class="cv-d"></div>
     </div>
-
-    <!-- APP GRID VIEW -->
-    <div class="app-grid-view" id="app-grid-view"></div>
-
-    <!-- CHAT VIEW -->
+    <div class="agv" id="agv"></div>
     <div class="chat-view" id="chat-view">
-      <div class="chat-messages" id="chat-messages">
-        <div class="empty-state" id="empty-state">
-          <div class="empty-logo">SAGE</div>
-          <div class="empty-hint" style="margin-bottom:1.25rem">Type or speak the shortest abbreviation of what you want. The AI resolves, chains, and executes.</div>
+      <div class="msgs" id="msgs">
+        <div class="empty" id="empty">
+          <div class="elogo">SAGE</div>
+          <div style="font-size:.72rem;line-height:1.7;max-width:310px;margin-bottom:1rem">Type any STARDUST command. Switch to App view to see your data.</div>
           <div>
-            <div class="quick-chip" onclick="useChip('prv diary write today felt peaceful')">prv diary write</div>
-            <div class="quick-chip" onclick="useChip('hm util track electric bill')">hm util track</div>
-            <div class="quick-chip" onclick="useChip('prv lust new attraction logged')">prv lust log</div>
-            <div class="quick-chip" onclick="useChip('soc frnd add alex goals hiking')">soc frnd add</div>
-            <div class="quick-chip" onclick="useChip('pln goal new learn guitar 90 days')">pln goal new</div>
-            <div class="quick-chip" onclick="useChip('prv drm last night forest and stars')">prv drm log</div>
-            <div class="quick-chip" onclick="useChip('pln evnt concert friday night')">pln evnt add</div>
-            <div class="quick-chip" onclick="useChip('pln place fav coffee shop downtown')">pln place save</div>
+            <div class="chip" onclick="useChip('self diary wrt today I felt grateful')">self diary wrt</div>
+            <div class="chip" onclick="useChip('self goal new learn stardust 60 days')">self goal new</div>
+            <div class="chip vc" onclick="useChip('mutual lockers part add johnson maya')">lkr part add</div>
+            <div class="chip vc" onclick="useChip('mutual lockers part view')">lkr part view</div>
+            <div class="chip vc" onclick="useChip('mutual lockers inv view')">lkr inv view</div>
+            <div class="chip vc" onclick="useChip('mutual ideaindex idea new cities pay residents for civic audit work')">idx idea new</div>
+            <div class="chip cy" onclick="useChip('civic chicago resident report pothole 42nd and michigan')">chi pothole</div>
+            <div class="chip co" onclick="useChip('commerce united buy ticket air LAX SFO after5pm under300')">united buy</div>
+            <div class="chip co" onclick="useChip('commerce starbucks buy delivery latte iced venti')">sbux order</div>
+            <div class="chip gl" onclick="useChip('global quote random')">quote random</div>
+            <div class="chip gl" onclick="useChip('global gratitude random')">gratitude random</div>
           </div>
         </div>
       </div>
-
-      <!-- SUGGESTIONS -->
-      <div class="suggestions" id="suggestions"></div>
-
-      <!-- INPUT -->
-      <div class="input-wrap">
-        <div class="input-row">
-          <textarea class="input-box" id="input-box"
-            placeholder="type shortest abbreviation · voice + text simultaneous"
+      <div class="sugs" id="sugs"></div>
+      <div class="inp-wrap">
+        <div class="inp-row">
+          <textarea class="ibox" id="ibox"
+            placeholder="self · mutual · civic · commerce · global · universal"
             rows="1"
             onkeydown="handleKey(event)"
             oninput="handleInput(this)"></textarea>
-          <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>➤</button>
+          <button class="sbtn" id="sbtn" onclick="send()" disabled>&#x27A4;</button>
         </div>
-        <div class="input-hint">enter to send · tab to select suggestion · esc to clear</div>
+        <div class="ihint">enter to send · tab to suggest · esc clear</div>
       </div>
     </div>
-
   </div>
-
-  <!-- RIGHT PANEL -->
-  <div class="right-panel collapsed" id="right-panel">
-    <div class="panel-header">
-      <div class="panel-title" id="panel-title">Dictionaries</div>
-      <button class="panel-close" onclick="closePanel()">✕</button>
-    </div>
-    <div class="panel-body" id="panel-body"></div>
+  <div class="rpanel" id="rpanel">
+    <div class="ph"><div class="ptitle" id="ptitle">Dictionaries</div><button class="pclose" onclick="closePanel()">&#x2715;</button></div>
+    <div class="pbody" id="pbody"></div>
   </div>
-
 </div>
 
 <script>
-// ── STATE ──────────────────────────────────────────────────────────────────
-const STATE = {
-  view: 'chat',
-  activeNode: 'root',
-  panel: null,
-  dicts: {
-    core: true,
-    urbanwolf: false,
-    outlaw: false,
-  },
-  settings: {
-    voice: true,
-    suggestions: true,
-    codeView: true,
-    autoChain: true,
-  },
-  entries: {},
-  sugHighlight: -1,
+// ═══════════════════════════════════════════════════════════════════
+// TAXONOMY  Mode → Domain → Action → Function → Category → Attr → Detail
+// Three grand levels: UNIVERSAL · GLOBAL · SELF
+// SELF contains: home · mutual · civic · commerce
+// ═══════════════════════════════════════════════════════════════════
+
+var TREE = {
+  // ── ROOT ──────────────────────────────────────────────────────────
+  root:{label:"Sage",icon:"&#x2736;",cmd:"~",type:"root",
+    children:["self","mutual","civic","commerce","global","universal"]},
+
+  // ── SELF (personal life) ──────────────────────────────────────────
+  self:{label:"Self",icon:"&#x1F9E0;",cmd:"self",type:"self",parent:"root",
+    children:["self_home","self_pln","self_soc","self_knw","self_fin","self_prv"]},
+
+  // Home (hidden routing nodes — user never types these)
+  self_home:{label:"Home",icon:"&#x1F3E0;",cmd:"self home",type:"self",parent:"self",hidden:true,
+    children:["self_home_util","self_home_rsrc","self_home_mnt","self_home_sec"]},
+  self_home_util:{label:"Utilities",icon:"&#x26A1;",cmd:"util",type:"self",parent:"self_home",children:[]},
+  self_home_rsrc:{label:"Resources",icon:"&#x1F4E6;",cmd:"rsrc",type:"self",parent:"self_home",children:[]},
+  self_home_mnt:{label:"Maintenance",icon:"&#x1F527;",cmd:"maint",type:"self",parent:"self_home",children:[]},
+  self_home_sec:{label:"Security",icon:"&#x1F512;",cmd:"sec",type:"self",parent:"self_home",children:[]},
+
+  // Planning
+  self_pln:{label:"Planning",icon:"&#x1F4C5;",cmd:"pln",type:"self",parent:"self",
+    children:["self_pln_goal","self_pln_evnt","self_pln_place","self_pln_trvl","self_pln_idea","self_pln_cal"]},
+  self_pln_goal:{label:"Goals",icon:"&#x1F3AF;",cmd:"goal",type:"self",parent:"self_pln",children:[]},
+  self_pln_evnt:{label:"Events",icon:"&#x1F4C6;",cmd:"evnt",type:"self",parent:"self_pln",children:[]},
+  self_pln_place:{label:"Places",icon:"&#x1F4CD;",cmd:"place",type:"self",parent:"self_pln",children:[]},
+  self_pln_trvl:{label:"Travel",icon:"&#x2708;",cmd:"trvl",type:"self",parent:"self_pln",children:[]},
+  self_pln_idea:{label:"Ideas",icon:"&#x1F4A1;",cmd:"idea",type:"self",parent:"self_pln",children:[]},
+  self_pln_cal:{label:"Calendar",icon:"&#x1F5D3;",cmd:"cal",type:"self",parent:"self_pln",children:[]},
+
+  // Social
+  self_soc:{label:"Social",icon:"&#x1F465;",cmd:"soc",type:"self",parent:"self",
+    children:["self_soc_frnd","self_soc_conn","self_soc_shr"]},
+  self_soc_frnd:{label:"Friends",icon:"&#x1F91D;",cmd:"frnd",type:"self",parent:"self_soc",children:[]},
+  self_soc_conn:{label:"Network",icon:"&#x1F517;",cmd:"conn",type:"self",parent:"self_soc",children:[]},
+  self_soc_shr:{label:"Share",icon:"&#x1F4E4;",cmd:"shr",type:"self",parent:"self_soc",children:[]},
+
+  // Knowledge
+  self_knw:{label:"Knowledge",icon:"&#x1F4DA;",cmd:"knw",type:"self",parent:"self",
+    children:["self_knw_cap","self_knw_res","self_knw_lgcy"]},
+  self_knw_cap:{label:"Capture",icon:"&#x1F4F8;",cmd:"cap",type:"self",parent:"self_knw",children:[]},
+  self_knw_res:{label:"Research",icon:"&#x1F50D;",cmd:"res",type:"self",parent:"self_knw",children:[]},
+  self_knw_lgcy:{label:"Legacy",icon:"&#x1F3DB;",cmd:"lgcy",type:"self",parent:"self_knw",children:[]},
+
+  // Finance (personal)
+  self_fin:{label:"Finance",icon:"&#x1F4B0;",cmd:"fin",type:"self",parent:"self",
+    children:["self_fin_bnk","self_fin_inv","self_fin_ins"]},
+  self_fin_bnk:{label:"Banking",icon:"&#x1F3E6;",cmd:"bnk",type:"self",parent:"self_fin",children:[]},
+  self_fin_inv:{label:"Investing",icon:"&#x1F4C8;",cmd:"inv",type:"self",parent:"self_fin",children:[]},
+  self_fin_ins:{label:"Insurance",icon:"&#x1F6E1;",cmd:"ins",type:"self",parent:"self_fin",children:[]},
+
+  // Private (hidden routing — user types diary/lust/dreams directly)
+  self_prv:{label:"Private",icon:"&#x1F510;",cmd:"prv",type:"self",parent:"self",hidden:true,
+    children:["self_prv_diary","self_prv_lust","self_prv_drm","self_prv_trma","self_prv_rage","self_prv_blf","self_prv_lgcy"]},
+  self_prv_diary:{label:"Diary",icon:"&#x1F4D3;",cmd:"diary",type:"self",parent:"self_prv",children:[]},
+  self_prv_lust:{label:"Lust",icon:"&#x1F525;",cmd:"lust",type:"self",parent:"self_prv",children:[]},
+  self_prv_drm:{label:"Dreams",icon:"&#x1F319;",cmd:"drm",type:"self",parent:"self_prv",children:[]},
+  self_prv_trma:{label:"Trauma",icon:"&#x1FA79;",cmd:"trma",type:"self",parent:"self_prv",children:[]},
+  self_prv_rage:{label:"Rage",icon:"&#x26A1;",cmd:"rage",type:"self",parent:"self_prv",children:[]},
+  self_prv_blf:{label:"Beliefs",icon:"&#x1F54A;",cmd:"blf",type:"self",parent:"self_prv",children:[]},
+  self_prv_lgcy:{label:"Legacy",icon:"&#x1F4DC;",cmd:"lgcy",type:"self",parent:"self_prv",children:[]},
+
+  // ── MUTUAL ────────────────────────────────────────────────────────
+  mutual:{label:"Mutual",icon:"&#x1F91D;",cmd:"mutual",type:"mutual",parent:"root",
+    children:["mutual_lkr","mutual_idx"]},
+
+  mutual_lkr:{label:"Lockers",icon:"&#x1F5C4;",cmd:"lockers",type:"mutual",parent:"mutual",
+    children:["mut_lkr_part","mut_lkr_chk","mut_lkr_asgn","mut_lkr_bar","mut_lkr_rnw","mut_lkr_wkd","mut_lkr_inv","mut_lkr_att","mut_lkr_rpt","mut_lkr_msg"]},
+  mut_lkr_part:{label:"Participants",icon:"&#x1F464;",cmd:"part",type:"mutual",parent:"mutual_lkr",children:[]},
+  mut_lkr_chk:{label:"Check In",icon:"&#x2705;",cmd:"chk",type:"mutual",parent:"mutual_lkr",children:[]},
+  mut_lkr_asgn:{label:"Assign",icon:"&#x1F511;",cmd:"asgn",type:"mutual",parent:"mutual_lkr",children:[]},
+  mut_lkr_bar:{label:"Bars",icon:"&#x1F6AB;",cmd:"bar",type:"mutual",parent:"mutual_lkr",children:[]},
+  mut_lkr_rnw:{label:"Renewals",icon:"&#x1F4C5;",cmd:"rnw",type:"mutual",parent:"mutual_lkr",children:[]},
+  mut_lkr_wkd:{label:"Work Dates",icon:"&#x1F6E0;",cmd:"wkd",type:"mutual",parent:"mutual_lkr",children:[]},
+  mut_lkr_inv:{label:"Inventory",icon:"&#x1F5C3;",cmd:"inv",type:"mutual",parent:"mutual_lkr",children:[]},
+  mut_lkr_att:{label:"Attendance",icon:"&#x1F4CB;",cmd:"att",type:"mutual",parent:"mutual_lkr",children:[]},
+  mut_lkr_rpt:{label:"Reports",icon:"&#x1F4CA;",cmd:"rpt",type:"mutual",parent:"mutual_lkr",children:[]},
+  mut_lkr_msg:{label:"Messages",icon:"&#x1F4AC;",cmd:"msg",type:"mutual",parent:"mutual_lkr",children:[]},
+
+  mutual_idx:{label:"IdeaIndex",icon:"&#x1F4A1;",cmd:"ideaindex",type:"mutual",parent:"mutual",
+    children:["mut_idx_idea","mut_idx_disc","mut_idx_jnl","mut_idx_vote","mut_idx_collab","mut_idx_feed","mut_idx_ldr"]},
+  mut_idx_idea:{label:"Ideas",icon:"&#x2728;",cmd:"idea",type:"mutual",parent:"mutual_idx",children:[]},
+  mut_idx_disc:{label:"Discover",icon:"&#x1F52D;",cmd:"disc",type:"mutual",parent:"mutual_idx",children:[]},
+  mut_idx_jnl:{label:"Journals",icon:"&#x1F4D3;",cmd:"jnl",type:"mutual",parent:"mutual_idx",children:[]},
+  mut_idx_vote:{label:"Vote",icon:"&#x2B06;",cmd:"vote",type:"mutual",parent:"mutual_idx",children:[]},
+  mut_idx_collab:{label:"Collaborate",icon:"&#x1F91D;",cmd:"collab",type:"mutual",parent:"mutual_idx",children:[]},
+  mut_idx_feed:{label:"Feed",icon:"&#x1F4F0;",cmd:"feed",type:"mutual",parent:"mutual_idx",children:[]},
+  mut_idx_ldr:{label:"Leaders",icon:"&#x1F31F;",cmd:"ldr",type:"mutual",parent:"mutual_idx",children:[]},
+
+  // ── CIVIC ─────────────────────────────────────────────────────────
+  civic:{label:"Civic",icon:"&#x1F3DB;",cmd:"civic",type:"civic",parent:"root",
+    children:["civ_chicago"]},
+
+  civ_chicago:{label:"Chicago",icon:"&#x1F307;",cmd:"chicago",type:"civic",parent:"civic",
+    children:["civ_chi_res","civ_chi_dev","civ_chi_elec","civ_chi_enf","civ_chi_shovel","civ_chi_srch"]},
+  civ_chi_res:{label:"Resident",icon:"&#x1F3E0;",cmd:"resident",type:"civic",parent:"civ_chicago",children:[]},
+  civ_chi_dev:{label:"Developer",icon:"&#x1F3D7;",cmd:"developer",type:"civic",parent:"civ_chicago",children:[]},
+  civ_chi_elec:{label:"Election",icon:"&#x1F5F3;",cmd:"election",type:"civic",parent:"civ_chicago",children:[]},
+  civ_chi_enf:{label:"EnforcerBounty",icon:"&#x1F46E;",cmd:"bounty",type:"civic",parent:"civ_chicago",children:[]},
+  civ_chi_shovel:{label:"ShovelAid",icon:"&#x26CF;",cmd:"shovelaid",type:"civic",parent:"civ_chicago",children:[]},
+  civ_chi_srch:{label:"Search",icon:"&#x1F50D;",cmd:"search",type:"civic",parent:"civ_chicago",children:[]},
+
+  // ── COMMERCE ──────────────────────────────────────────────────────
+  commerce:{label:"Commerce",icon:"&#x1F4BC;",cmd:"commerce",type:"commerce",parent:"root",
+    children:["com_united","com_starbucks"]},
+
+  com_united:{label:"United",icon:"&#x2708;",cmd:"united",type:"commerce",parent:"commerce",
+    children:["com_ua_buy","com_ua_mod","com_ua_srch"]},
+  com_ua_buy:{label:"Buy",icon:"&#x1F4B3;",cmd:"buy",type:"commerce",parent:"com_united",children:[]},
+  com_ua_mod:{label:"Modify",icon:"&#x270F;",cmd:"modify",type:"commerce",parent:"com_united",children:[]},
+  com_ua_srch:{label:"Search",icon:"&#x1F50D;",cmd:"search",type:"commerce",parent:"com_united",children:[]},
+
+  com_starbucks:{label:"Starbucks",icon:"&#x2615;",cmd:"starbucks",type:"commerce",parent:"commerce",
+    children:["com_sbux_buy","com_sbux_req","com_sbux_srch"]},
+  com_sbux_buy:{label:"Buy",icon:"&#x1F4B3;",cmd:"buy",type:"commerce",parent:"com_starbucks",children:[]},
+  com_sbux_req:{label:"Request",icon:"&#x1F4DD;",cmd:"request",type:"commerce",parent:"com_starbucks",children:[]},
+  com_sbux_srch:{label:"Search",icon:"&#x1F50D;",cmd:"search",type:"commerce",parent:"com_starbucks",children:[]},
+
+  // ── GLOBAL ────────────────────────────────────────────────────────
+  global:{label:"Global",icon:"&#x1F30D;",cmd:"global",type:"global",parent:"root",
+    children:["glb_people","glb_places","glb_animals","glb_countries","glb_stories","glb_wisdom"]},
+  glb_people:{label:"People",icon:"&#x1F9D1;",cmd:"people",type:"global",parent:"global",children:[]},
+  glb_places:{label:"Places",icon:"&#x1F5FA;",cmd:"places",type:"global",parent:"global",children:[]},
+  glb_animals:{label:"Animals",icon:"&#x1F98B;",cmd:"animals",type:"global",parent:"global",children:[]},
+  glb_countries:{label:"Countries",icon:"&#x1F30E;",cmd:"countries",type:"global",parent:"global",children:[]},
+  glb_stories:{label:"Stories",icon:"&#x1F4D6;",cmd:"stories",type:"global",parent:"global",children:[]},
+  glb_wisdom:{label:"Wisdom",icon:"&#x1F4AC;",cmd:"wisdom",type:"global",parent:"global",
+    children:["glb_quote","glb_grat"]},
+  glb_quote:{label:"Quotes",icon:"&#x275D;",cmd:"quote",type:"global",parent:"glb_wisdom",children:[]},
+  glb_grat:{label:"Gratitudes",icon:"&#x1F9E1;",cmd:"gratitude",type:"global",parent:"glb_wisdom",children:[]},
+
+  // ── UNIVERSAL ─────────────────────────────────────────────────────
+  universal:{label:"Universal",icon:"&#x1FA90;",cmd:"universal",type:"universal",parent:"root",
+    children:["uni_planets","uni_stars","uni_forces","uni_elements","uni_gases"]},
+  uni_planets:{label:"Planets",icon:"&#x1FA90;",cmd:"planets",type:"universal",parent:"universal",children:[]},
+  uni_stars:{label:"Stars",icon:"&#x2B50;",cmd:"stars",type:"universal",parent:"universal",children:[]},
+  uni_forces:{label:"Forces",icon:"&#x26A1;",cmd:"forces",type:"universal",parent:"universal",children:[]},
+  uni_elements:{label:"Elements",icon:"&#x269B;",cmd:"elements",type:"universal",parent:"universal",children:[]},
+  uni_gases:{label:"Gases",icon:"&#x1F32B;",cmd:"gases",type:"universal",parent:"universal",children:[]}
 };
 
-// ── TREE DEFINITION ────────────────────────────────────────────────────────
-const TREE = {
-  root: { label: 'Sage', icon: '✦', cmd: '~', children: ['prv','hm','soc','pln','knw'] },
-  prv: { label: 'Private', icon: '🔐', cmd: 'prv', parent: 'root',
-    children: ['prv_diary','prv_lust','prv_drm','prv_trma','prv_rage','prv_blf','prv_lgcy'] },
-  prv_diary: { label: 'Diary', icon: '📓', cmd: 'prv diary', parent: 'prv', children: [] },
-  prv_lust: { label: 'Lust', icon: '🔥', cmd: 'prv lust', parent: 'prv', children: [] },
-  prv_drm: { label: 'Dreams', icon: '🌙', cmd: 'prv drm', parent: 'prv', children: [] },
-  prv_trma: { label: 'Trauma', icon: '🩹', cmd: 'prv trma', parent: 'prv', children: [] },
-  prv_rage: { label: 'Rage', icon: '⚡', cmd: 'prv rage', parent: 'prv', children: [] },
-  prv_blf: { label: 'Beliefs', icon: '🕊', cmd: 'prv blf', parent: 'prv', children: [] },
-  prv_lgcy: { label: 'Legacy', icon: '📜', cmd: 'prv lgcy', parent: 'prv', children: [] },
-  hm: { label: 'Home', icon: '🏠', cmd: 'hm', parent: 'root',
-    children: ['hm_util','hm_rsrc','hm_mnt','hm_sec','hm_fin'] },
-  hm_util: { label: 'Utilities', icon: '⚡', cmd: 'hm util', parent: 'hm', children: [] },
-  hm_rsrc: { label: 'Resources', icon: '📦', cmd: 'hm rsrc', parent: 'hm', children: [] },
-  hm_mnt: { label: 'Maintenance', icon: '🔧', cmd: 'hm mnt', parent: 'hm', children: [] },
-  hm_sec: { label: 'Security', icon: '🔒', cmd: 'hm sec', parent: 'hm', children: [] },
-  hm_fin: { label: 'Finance', icon: '💰', cmd: 'hm fin', parent: 'hm', children: [] },
-  soc: { label: 'Social', icon: '👥', cmd: 'soc', parent: 'root',
-    children: ['soc_frnd','soc_dat','soc_sup','soc_skl'] },
-  soc_frnd: { label: 'Friends', icon: '🤝', cmd: 'soc frnd', parent: 'soc', children: [] },
-  soc_dat: { label: 'Connections', icon: '💫', cmd: 'soc dat', parent: 'soc', children: [] },
-  soc_sup: { label: 'Support', icon: '🫂', cmd: 'soc sup', parent: 'soc', children: [] },
-  soc_skl: { label: 'Skills Exchange', icon: '🔄', cmd: 'soc skl', parent: 'soc', children: [] },
-  pln: { label: 'Planning', icon: '📅', cmd: 'pln', parent: 'root',
-    children: ['pln_goal','pln_evnt','pln_place','pln_trvl','pln_idea','pln_mlstn'] },
-  pln_goal: { label: 'Goals', icon: '🎯', cmd: 'pln goal', parent: 'pln', children: [] },
-  pln_evnt: { label: 'Events', icon: '📆', cmd: 'pln evnt', parent: 'pln', children: [] },
-  pln_place: { label: 'Places', icon: '📍', cmd: 'pln place', parent: 'pln', children: [] },
-  pln_trvl: { label: 'Travel', icon: '✈', cmd: 'pln trvl', parent: 'pln', children: [] },
-  pln_idea: { label: 'Ideas', icon: '💡', cmd: 'pln idea', parent: 'pln', children: [] },
-  pln_mlstn: { label: 'Milestones', icon: '🏆', cmd: 'pln mlstn', parent: 'pln', children: [] },
-  knw: { label: 'Knowledge', icon: '🧠', cmd: 'knw', parent: 'root',
-    children: ['knw_cap','knw_res','knw_drm','knw_lgcy'] },
-  knw_cap: { label: 'Capture', icon: '📸', cmd: 'knw cap', parent: 'knw', children: [] },
-  knw_res: { label: 'Research', icon: '🔍', cmd: 'knw res', parent: 'knw', children: [] },
-  knw_drm: { label: 'Dream Log', icon: '🌀', cmd: 'knw drm', parent: 'knw', children: [] },
-  knw_lgcy: { label: 'Legacy Vault', icon: '🏛', cmd: 'knw lgcy', parent: 'knw', children: [] },
+// ── DEMO DATA ────────────────────────────────────────────────────────────────
+var DEMO = {
+  // Locker participants
+  lkr_participants: [
+    {id:"P001",name:"Anderson, Maya",lockers:["L14"],status:"active",wkd:"May 20",mtg:"May 8",renewed:"May 1"},
+    {id:"P002",name:"Johnson, Darius",lockers:["L07","L22"],status:"active",wkd:"May 18",mtg:"May 8",renewed:"May 2"},
+    {id:"P003",name:"Rivera, Carlos",lockers:["L03"],status:"inactive",wkd:"MISSED",mtg:"May 8",renewed:"Apr 15",reason:"Missed work date"},
+    {id:"P004",name:"Thompson, Keisha",lockers:["L19"],status:"active",wkd:"May 25",mtg:"May 8",renewed:"May 1"},
+    {id:"P005",name:"Nguyen, Linh",lockers:["L11"],status:"barred",wkd:"—",mtg:"—",renewed:"Apr 15",reason:"EC bar expires Jun 5"},
+    {id:"P006",name:"Williams, James",lockers:["L08","L16"],status:"active",wkd:"May 22",mtg:"May 8",renewed:"May 3"},
+  ],
+  // Locker inventory
+  lkr_inventory: [
+    {id:"L01",status:"available",size:"S"},{id:"L02",status:"taken",occupant:"—",size:"S"},
+    {id:"L03",status:"taken",occupant:"Rivera",size:"M"},{id:"L04",status:"available",size:"M"},
+    {id:"L05",status:"broken",size:"M"},{id:"L06",status:"available",size:"L"},
+    {id:"L07",status:"taken",occupant:"Johnson",size:"M"},{id:"L08",status:"taken",occupant:"Williams",size:"S"},
+    {id:"L09",status:"available",size:"S"},{id:"L10",status:"broken",size:"L"},
+    {id:"L11",status:"taken",occupant:"Nguyen",size:"M"},{id:"L12",status:"available",size:"S"},
+    {id:"L13",status:"available",size:"L"},{id:"L14",status:"taken",occupant:"Anderson",size:"M"},
+    {id:"L15",status:"available",size:"S"},{id:"L16",status:"taken",occupant:"Williams",size:"M"},
+    {id:"L17",status:"available",size:"L"},{id:"L18",status:"available",size:"S"},
+    {id:"L19",status:"taken",occupant:"Thompson",size:"M"},{id:"L20",status:"available",size:"L"},
+    {id:"L21",status:"broken",size:"S"},{id:"L22",status:"taken",occupant:"Johnson",size:"L"},
+  ],
+  // IdeaIndex ideas
+  idx_ideas: [
+    {id:"I001",title:"Cities pay residents for civic audit work",author:"m.anderson",votes:47,status:"public",tags:["civic","economy"]},
+    {id:"I002",title:"STARDUST-native city permit system",author:"d.johnson",votes:31,status:"public",tags:["tech","gov"]},
+    {id:"I003",title:"Community locker networks in every ward",author:"k.thompson",votes:28,status:"public",tags:["mutual","housing"]},
+    {id:"I004",title:"Pedestrian bounty system for sidewalk safety",author:"l.nguyen",votes:19,status:"public",tags:["civic","safety"]},
+    {id:"I005",title:"Mutual aid food exchange via STARDUST",author:"j.williams",votes:15,status:"public",tags:["mutual","food"]},
+  ],
 };
 
-// Suggestions corpus
-const SUGGESTIONS = [
-  { cmd: 'prv diary wrt', desc: 'Write a diary entry', node: 'prv_diary', badge: 'prv' },
-  { cmd: 'prv diary read', desc: 'Read past entries', node: 'prv_diary', badge: 'prv' },
-  { cmd: 'prv lust log', desc: 'Log a private feeling', node: 'prv_lust', badge: 'prv' },
-  { cmd: 'prv drm log', desc: 'Record a dream', node: 'prv_drm', badge: 'prv' },
-  { cmd: 'prv rage vent', desc: 'Release into the vault', node: 'prv_rage', badge: 'prv' },
-  { cmd: 'prv trma note', desc: 'Log a trauma note', node: 'prv_trma', badge: 'prv' },
-  { cmd: 'prv blf add', desc: 'Record a belief', node: 'prv_blf', badge: 'prv' },
-  { cmd: 'prv lgcy msg', desc: 'Write a legacy message', node: 'prv_lgcy', badge: 'prv' },
-  { cmd: 'hm util track', desc: 'Track a utility', node: 'hm_util', badge: 'hm' },
-  { cmd: 'hm rsrc add', desc: 'Log a home resource', node: 'hm_rsrc', badge: 'hm' },
-  { cmd: 'hm mnt req', desc: 'Request maintenance', node: 'hm_mnt', badge: 'hm' },
-  { cmd: 'hm fin track', desc: 'Track home expense', node: 'hm_fin', badge: 'hm' },
-  { cmd: 'soc frnd add', desc: 'Add a friend profile', node: 'soc_frnd', badge: 'soc' },
-  { cmd: 'soc frnd log', desc: 'Log time with friend', node: 'soc_frnd', badge: 'soc' },
-  { cmd: 'soc dat log', desc: 'Log a connection note', node: 'soc_dat', badge: 'soc' },
-  { cmd: 'pln goal new', desc: 'Create a new goal', node: 'pln_goal', badge: 'pln' },
-  { cmd: 'pln goal upd', desc: 'Update goal progress', node: 'pln_goal', badge: 'pln' },
-  { cmd: 'pln evnt add', desc: 'Add an event', node: 'pln_evnt', badge: 'pln' },
-  { cmd: 'pln place sav', desc: 'Save a place', node: 'pln_place', badge: 'pln' },
-  { cmd: 'pln idea cap', desc: 'Capture an idea', node: 'pln_idea', badge: 'pln' },
-  { cmd: 'pln trvl plan', desc: 'Plan a trip', node: 'pln_trvl', badge: 'pln' },
-  { cmd: 'pln mlstn add', desc: 'Add a milestone', node: 'pln_mlstn', badge: 'pln' },
-  { cmd: 'knw cap note', desc: 'Capture a thought', node: 'knw_cap', badge: 'knw' },
-  { cmd: 'knw res start', desc: 'Start research thread', node: 'knw_res', badge: 'knw' },
+// ── QUOTES & GRATITUDES (100 each) ─────────────────────────────────────────
+var QUOTES = [
+  {text:"The only way to do great work is to love what you do.",attr:"Steve Jobs"},
+  {text:"In the middle of every difficulty lies opportunity.",attr:"Albert Einstein"},
+  {text:"It does not matter how slowly you go as long as you do not stop.",attr:"Confucius"},
+  {text:"Life is what happens to you while you're busy making other plans.",attr:"John Lennon"},
+  {text:"The future belongs to those who believe in the beauty of their dreams.",attr:"Eleanor Roosevelt"},
+  {text:"It is during our darkest moments that we must focus to see the light.",attr:"Aristotle"},
+  {text:"Spread love everywhere you go. Let no one ever come to you without leaving happier.",attr:"Mother Teresa"},
+  {text:"When you reach the end of your rope, tie a knot in it and hang on.",attr:"Franklin D. Roosevelt"},
+  {text:"Always remember that you are absolutely unique. Just like everyone else.",attr:"Margaret Mead"},
+  {text:"Do not go where the path may lead, go instead where there is no path and leave a trail.",attr:"Ralph Waldo Emerson"},
+  {text:"You will face many defeats in life, but never let yourself be defeated.",attr:"Maya Angelou"},
+  {text:"The greatest glory in living lies not in never falling, but in rising every time we fall.",attr:"Nelson Mandela"},
+  {text:"In the end, it's not the years in your life that count. It's the life in your years.",attr:"Abraham Lincoln"},
+  {text:"Never let the fear of striking out keep you from playing the game.",attr:"Babe Ruth"},
+  {text:"Life is either a daring adventure or nothing at all.",attr:"Helen Keller"},
+  {text:"Many of life's failures are people who did not realize how close they were to success when they gave up.",attr:"Thomas Edison"},
+  {text:"You have brains in your head. You have feet in your shoes. You can steer yourself any direction you choose.",attr:"Dr. Seuss"},
+  {text:"If life were predictable it would cease to be life, and be without flavor.",attr:"Eleanor Roosevelt"},
+  {text:"If you look at what you have in life, you'll always have more. If you look at what you don't have, you'll never have enough.",attr:"Oprah Winfrey"},
+  {text:"If you want to live a happy life, tie it to a goal, not to people or things.",attr:"Albert Einstein"},
 ];
 
-// ── SYSTEM PROMPT ──────────────────────────────────────────────────────────
-function buildSystemPrompt() {
-  const activeDicts = Object.entries(STATE.dicts).filter(([,v])=>v).map(([k])=>k).join(', ');
-  return `You are SAGE, the AI engine of the Sage personal intelligence system, built on the STARDUST protocol.
+var GRATITUDES = [
+  {text:"I am grateful for the people who believed in me before I believed in myself.",attr:"Reflection"},
+  {text:"I am grateful for mornings — each one is a new beginning that was never promised.",attr:"Reflection"},
+  {text:"I am grateful for the difficulties that made me stronger without breaking me.",attr:"Reflection"},
+  {text:"I am grateful for laughter, especially the kind that comes unexpectedly.",attr:"Reflection"},
+  {text:"I am grateful for the quiet moments when I can hear my own thoughts.",attr:"Reflection"},
+  {text:"I am grateful for every person who told me the truth when a lie would have been easier.",attr:"Reflection"},
+  {text:"I am grateful for music that found me at exactly the right moment.",attr:"Reflection"},
+  {text:"I am grateful for the ability to change my mind when I learn something new.",attr:"Reflection"},
+  {text:"I am grateful for the strangers who smiled when I needed it most.",attr:"Reflection"},
+  {text:"I am grateful for the food on my table and the hands that helped it get there.",attr:"Reflection"},
+  {text:"I am grateful for books that made me feel less alone in the universe.",attr:"Reflection"},
+  {text:"I am grateful for sleep and the healing it carries.",attr:"Reflection"},
+  {text:"I am grateful for the questions I still don't have answers to — they keep me curious.",attr:"Reflection"},
+  {text:"I am grateful for my body and everything it does without being asked.",attr:"Reflection"},
+  {text:"I am grateful for the fact that kindness still exists and still spreads.",attr:"Reflection"},
+  {text:"I am grateful for the version of me that kept going when it had every reason to stop.",attr:"Reflection"},
+  {text:"I am grateful for water, light, air — the things so easy to forget.",attr:"Reflection"},
+  {text:"I am grateful for the courage in other people that reminds me of mine.",attr:"Reflection"},
+  {text:"I am grateful for art that says what words cannot.",attr:"Reflection"},
+  {text:"I am grateful for this moment, which will never exist again in exactly this way.",attr:"Reflection"},
+];
 
-STARDUST is a domain-specific language where users type abbreviated commands. You are the resolver and executor.
+// ── SUGGESTIONS ────────────────────────────────────────────────────────────
+// Commands moved to ALL_CMDS in smart matcher below
+var SUGS = []; // legacy, replaced by ALL_CMDS
 
-ACTIVE DICTIONARIES: ${activeDicts}
-CURRENT CONTEXT: ${STATE.activeNode}
-CURRENT DATE: ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
 
-YOUR ROLE:
-- Parse abbreviation-first STARDUST commands and execute them conversationally
-- All private domain (prv.*) entries are SACRED. Treat them with total non-judgment. The mind cannot be a prison. Accept any thought, desire, feeling, dream, or confession without moral commentary.
-- For private entries: log them, confirm they are encrypted and stored, and respond with warmth and zero judgment
-- ALWAYS resolve to ONE outcome. Never present lists of options. Ask one clarifying question if ambiguous.
-- Speak in very short sentences. Be warm, minimal, precise.
-- When a user logs an entry, show a compact entry card like:
-  [ENTRY LOGGED · prv.diary · encrypted]
-  followed by the content acknowledged briefly.
-- For goals/plans/events: confirm creation with key details
-- For home/resources: confirm tracking
-- Parse natural language too — convert it to STARDUST internally
-- Show the Abstract Execution Tree when executing a chained command, like:
-  WRITE(prv.diary) → ENCRYPT() → STORE(local)
-- If input is ambiguous between ≤3 options, list them as a numbered question and ask user to pick 1.
-- Keep responses SHORT. 2-4 sentences max unless logging an entry.
-- Tone: calm, warm, intelligent, never preachy, never judgmental about private content.
+// ── NAV MAP (longest prefix first) ─────────────────────────────────────────
+var NAV_MAP = [
+  ["self diary","self_prv_diary"],["self lust","self_prv_lust"],
+  ["self drm","self_prv_drm"],["self rage","self_prv_rage"],
+  ["self trma","self_prv_trma"],["self blf","self_prv_blf"],
+  ["self home prv","self_prv"],["self prv","self_prv"],
+  ["self home util","self_home_util"],["self home rsrc","self_home_rsrc"],
+  ["self home mnt","self_home_mnt"],["self home sec","self_home_sec"],
+  ["self pln goal","self_pln_goal"],["self goal","self_pln_goal"],
+  ["self pln evnt","self_pln_evnt"],["self evnt","self_pln_evnt"],
+  ["self pln trvl","self_pln_trvl"],["self pln idea","self_pln_idea"],
+  ["self pln cal","self_pln_cal"],["self pln","self_pln"],
+  ["self soc frnd","self_soc_frnd"],["self frnd","self_soc_frnd"],
+  ["self soc conn","self_soc_conn"],["self soc","self_soc"],
+  ["self knw cap","self_knw_cap"],["self knw res","self_knw_res"],
+  ["self knw","self_knw"],
+  ["self fin bnk","self_fin_bnk"],["self fin","self_fin"],
+  ["self home","self_home"],["self","self"],
+  ["mutual lockers part","mut_lkr_part"],
+  ["mutual lockers chk","mut_lkr_chk"],["mutual lockers asgn","mut_lkr_asgn"],
+  ["mutual lockers bar","mut_lkr_bar"],["mutual lockers rnw","mut_lkr_rnw"],
+  ["mutual lockers wkd","mut_lkr_wkd"],["mutual lockers inv","mut_lkr_inv"],
+  ["mutual lockers att","mut_lkr_att"],["mutual lockers rpt","mut_lkr_rpt"],
+  ["mutual lockers msg","mut_lkr_msg"],["mutual lockers","mutual_lkr"],
+  ["mutual ideaindex idea","mut_idx_idea"],["mutual ideaindex disc","mut_idx_disc"],
+  ["mutual ideaindex vote","mut_idx_vote"],["mutual ideaindex jnl","mut_idx_jnl"],
+  ["mutual ideaindex collab","mut_idx_collab"],["mutual ideaindex feed","mut_idx_feed"],
+  ["mutual ideaindex ldr","mut_idx_ldr"],["mutual ideaindex","mutual_idx"],
+  ["mutual","mutual"],
+  ["civic chicago resident","civ_chi_res"],["civic chicago developer","civ_chi_dev"],
+  ["civic chicago election","civ_chi_elec"],["civic chicago bounty","civ_chi_enf"],
+  ["civic chicago shovelaid","civ_chi_shovel"],["civic chicago","civ_chicago"],
+  ["civic","civic"],
+  ["commerce united buy","com_ua_buy"],["commerce united modify","com_ua_mod"],
+  ["commerce united search","com_ua_srch"],["commerce united","com_united"],
+  ["commerce starbucks buy","com_sbux_buy"],["commerce starbucks request","com_sbux_req"],
+  ["commerce starbucks","com_starbucks"],["commerce","commerce"],
+  ["global quote","glb_quote"],["global gratitude","glb_grat"],
+  ["global people","glb_people"],["global places","glb_places"],
+  ["global animals","glb_animals"],["global countries","glb_countries"],
+  ["global wisdom","glb_wisdom"],["global","global"],
+  ["universal planets","uni_planets"],["universal stars","uni_stars"],
+  ["universal forces","uni_forces"],["universal elements","uni_elements"],
+  ["universal gases","uni_gases"],["universal","universal"],
+];
 
-PRIVATE DOMAIN RULE: When content is marked prv.*, respond only with confirmation of secure storage and one warm acknowledgment sentence. Never analyze, judge, or expand on private content beyond what the user asked for.`;
+// ── STATE ────────────────────────────────────────────────────────────────────
+window.ST = {
+  view:"chat", node:"root", panel:null, hi:-1,
+  dicts:{core:true,lockers:true,ideaindex:true,urbanwolf:false,outlaw:false},
+  votes:{}, entries:{}, history:[]
+};
+var ST = window.ST;
+
+// ── DOMAIN COLORS ────────────────────────────────────────────────────────────
+function domainColor(type, variant) {
+  var map = {
+    self:   {top:"var(--gold)",    tc:"var(--gold-soft)",   ava:"sage", sec:"var(--gold-dim)"},
+    mutual: {top:"var(--violet)",  tc:"var(--violet-lt)",   ava:"mut",  sec:"var(--violet)"},
+    civic:  {top:"var(--sky)",     tc:"var(--sky-lt)",      ava:"civ",  sec:"var(--sky)"},
+    commerce:{top:"var(--amber)", tc:"var(--amber-lt)",    ava:"com",  sec:"var(--amber)"},
+    global: {top:"var(--emerald)",tc:"var(--emerald-lt)",  ava:"glb",  sec:"var(--emerald)"},
+    universal:{top:"#6366F1",     tc:"#C7D2FE",            ava:"uni",  sec:"#6366F1"},
+    root:   {top:"var(--gold)",   tc:"var(--gold-soft)",   ava:"sage", sec:"var(--gold-dim)"},
+  };
+  var d = map[type] || map.self;
+  return d[variant] || d.tc;
 }
 
-// ── API CALL ───────────────────────────────────────────────────────────────
-let conversationHistory = [];
+function nodeType(key) {
+  var n = TREE[key]; if(!n) return "self";
+  if(n.type) return n.type;
+  var cur = key;
+  while(cur && TREE[cur]) { if(TREE[cur].type) return TREE[cur].type; cur = TREE[cur].parent; }
+  return "self";
+}
 
-async function callSage(userMessage) {
-  conversationHistory.push({ role: 'user', content: userMessage });
+// ── TREE RENDER ──────────────────────────────────────────────────────────────
+function sk(keys){
+  return (keys||[]).slice().sort(function(a,b){
+    var va=ST.votes[a]||{up:0,down:0}; var vb=ST.votes[b]||{up:0,down:0};
+    return(vb.up-vb.down)-(va.up-va.down);
+  });
+}
+function mvb(k){
+  var v=ST.votes[k]||{up:0,down:0,mine:null}; var s=v.up-v.down;
+  return'<span class="vote-bar" onclick="event.stopPropagation()"><button class="vbtn2'+(v.mine==="up"?" up-on":"")+'" onclick="vt(\''+k+'\',\'up\',event)">&#x25B2;</button><span class="vscore'+(s>0?" pos":s<0?" neg":"")+'">'+(s!==0?(s>0?"+":"")+s:"&middot;")+'</span><button class="vbtn2'+(v.mine==="down"?" dn-on":"")+'" onclick="vt(\''+k+'\',\'down\',event)">&#x25BC;</button></span>';
+}
+function vt(k,dir,e){
+  e.stopPropagation();
+  if(!ST.votes[k])ST.votes[k]={up:0,down:0,mine:null};
+  var v=ST.votes[k];
+  if(v.mine===dir){v[dir]--;v.mine=null;}else{if(v.mine)v[v.mine]--;v[dir]++;v.mine=dir;}
+  renderTree();
+}
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1000,
-      system: buildSystemPrompt(),
-      messages: conversationHistory,
-    }),
+function renderTree(){
+  var el=document.getElementById("tree-list"); var h="";
+  var topLevel = ["self","mutual","civic","commerce","global","universal"];
+
+  // Section separators
+  var sections = [
+    {label:"&#x2736; Self",   keys:["self"],                         color:"var(--gold-dim)"},
+    {label:"&#x1F91D; Mutual", keys:["mutual"],                       color:"var(--violet)"},
+    {label:"&#x1F3DB; Civic",  keys:["civic"],                        color:"var(--sky)"},
+    {label:"&#x1F4BC; Commerce",keys:["commerce"],                    color:"var(--amber)"},
+    {label:"&#x1F30D; Global", keys:["global","universal"],           color:"var(--emerald)"},
+  ];
+
+  sections.forEach(function(sec){
+    h+='<div class="sb-sec" style="color:'+sec.color+'">'+sec.label+'</div>';
+    sec.keys.forEach(function(domKey){
+      var dom = TREE[domKey]; if(!dom) return;
+      var tc = domainColor(dom.type,"tc");
+      var ac = ST.node===domKey?" active":"";
+      var open = ST.node===domKey||ST.node.startsWith(domKey.replace("_","")+"_")||isDescendant(domKey,ST.node);
+      h+='<div class="tnode d1'+ac+'" style="'+(ST.node===domKey?"border-left-color:"+domainColor(dom.type,"top")+";color:"+tc+";":"")+'" onclick="navTo(\''+domKey+'\')">'
+        +dom.icon+" "+dom.label+mvb(domKey)+'<span class="ncmd" style="color:'+tc+'">'+dom.cmd+'</span></div>';
+      if(open && dom.children && dom.children.length){
+        sk(dom.children).forEach(function(ck){
+          var cn=TREE[ck]; if(!cn||cn.hidden) return;
+          var cac=ST.node===ck?" active":"";
+          var copen = isDescendant(ck,ST.node)||ST.node===ck;
+          var ctc = domainColor(cn.type||dom.type,"tc");
+          h+='<div class="tnode d2'+cac+'" style="'+(ST.node===ck?"border-left-color:"+domainColor(cn.type||dom.type,"top")+";color:"+ctc+";":"")+'" onclick="navTo(\''+ck+'\')">'
+            +cn.icon+" "+cn.label+mvb(ck)+'<span class="ncmd" style="color:'+ctc+'">'+cn.cmd+'</span></div>';
+          if(copen && cn.children && cn.children.length){
+            sk(cn.children).forEach(function(gk){
+              var gn=TREE[gk]; if(!gn) return;
+              var gac=ST.node===gk?" active":"";
+              var gtc=domainColor(gn.type||dom.type,"tc");
+              h+='<div class="tnode d3'+gac+'" style="'+(ST.node===gk?"border-left-color:"+domainColor(gn.type||dom.type,"top")+";color:"+gtc+";":"")+'" onclick="navTo(\''+gk+'\')">'
+                +gn.icon+" "+gn.label+mvb(gk)+'<span class="ncmd" style="color:'+gtc+'">'+gn.cmd+'</span></div>';
+            });
+          }
+        });
+      }
+    });
+  });
+  el.innerHTML=h;
+}
+
+function isDescendant(ancestor, node){
+  var cur=node;
+  while(cur&&TREE[cur]){if(cur===ancestor)return true;cur=TREE[cur].parent;}
+  return false;
+}
+
+function renderBC(){
+  var cr=[{key:"root",label:"~"}]; var cur=ST.node;
+  while(cur&&cur!=="root"){var p=TREE[cur];if(p){cr.splice(1,0,{key:cur,label:p.label});cur=p.parent;}else break;}
+  var seen={}; var u=cr.filter(function(c){if(seen[c.key])return false;seen[c.key]=true;return true;});
+  document.getElementById("breadcrumb").innerHTML=u.map(function(c,i){
+    var t=c.key==="root"?"":nodeType(c.key);
+    var col=i===u.length-1?domainColor(t,"tc"):""
+    return'<span class="bc'+(i===u.length-1?" active":"")+'" style="'+(col?"color:"+col+";":"")+'" onclick="navTo(\''+c.key+'\')">'+c.label+'</span>';
+  }).join('<span class="bc-arr"> &rsaquo; </span>');
+}
+
+function renderCV(){
+  var n=TREE[ST.node]; if(!n) return;
+  document.getElementById("cv-ctx").textContent=n.cmd;
+  var visible=(n.children||[]).filter(function(k){return!TREE[k]||!TREE[k].hidden;});
+  var t="";
+  if(visible.length){t=visible.map(function(k){return"  \u251C\u2500 "+(TREE[k]?TREE[k].cmd:k).padEnd(14)+" "+(TREE[k]?TREE[k].label:k);}).join("\n");}
+  else if(n.parent){t="  parent: "+(TREE[n.parent]?TREE[n.parent].cmd:n.parent)+"\n  scope: leaf"+(n.type==="self"&&n.cmd==="diary"?" \u00B7 encrypted":"");}
+  document.getElementById("cv-tree").textContent=t;
+}
+
+function renderAGV(){
+  var el=document.getElementById("agv"); var n=TREE[ST.node];
+  var t=nodeType(ST.node);
+  var topC=domainColor(t,"top"); var tcC=domainColor(t,"tc");
+  var kids=(ST.node==="root"?TREE.root.children:(n.children||[])).filter(function(k){return!TREE[k]||!TREE[k].hidden;});
+  var h='<div class="agv-title">'+n.icon+" "+n.label+'</div><div class="agv-sub" style="color:'+tcC+'">'+n.cmd+'</div>';
+  if(kids.length){
+    h+='<div class="box-grid">';
+    kids.forEach(function(k){
+      var cn=TREE[k]; if(!cn||cn.hidden) return;
+      var ct=nodeType(k); var ctop=domainColor(ct,"top"); var ctc=domainColor(ct,"tc");
+      var ec=(ST.entries[k]||[]).length;
+      h+='<div class="bbox" style="border-top-color:'+ctop+';'+(ST.node===k?"border-color:var(--gold)":"")+'" onclick="navTo(\''+k+'\')">'
+        +'<div class="bl">'+cn.icon+" "+cn.label+'</div>'
+        +'<div class="bc2" style="color:'+ctc+'">'+cn.cmd+'</div>'
+        +(ec?'<div class="bct" style="color:var(--teal-lt)">'+ec+' entr'+(ec===1?"y":"ies")+'</div>'
+          :(cn.children&&cn.children.filter(function(c){return!TREE[c]||!TREE[c].hidden;}).length?'<div class="bct">'+cn.children.filter(function(c){return!TREE[c]||!TREE[c].hidden;}).length+' nodes</div>':''))
+        +'</div>';
+    });
+    h+='</div>';
+  }
+  var ents=ST.entries[ST.node]||[];
+  if(ents.length){
+    h+='<div class="entry-sec"><div class="entry-sec-title">'+ents.length+' entr'+(ents.length===1?"y":"ies")+'</div>';
+    ents.forEach(function(e){
+      h+='<div class="ecard"><div class="ets">'+sH(e.ts)+'&nbsp;&middot;&nbsp;'+sH(e.node)+'</div>'
+        +(e.tag?'<div class="etag2">'+sH(e.tag)+'</div>':'')
+        +'<div class="ebody">'+sH(e.text)+'</div></div>';
+    });
+    h+='</div>';
+  } else if(!kids.length){
+    h+='<div class="entry-sec"><div style="font-size:.77rem;color:var(--muted);font-style:italic">No entries yet. Use chat to add one.</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+function navTo(k){ST.node=k;renderTree();renderBC();renderCV();if(ST.view==="app")renderAGV();}
+function autoNav(cmd){var c=cmd.toLowerCase().trim();for(var i=0;i<NAV_MAP.length;i++){if(c.indexOf(NAV_MAP[i][0])===0){navTo(NAV_MAP[i][1]);return;}}}
+function setView(v){
+  ST.view=v;
+  document.getElementById("btn-chat").classList.toggle("active",v==="chat");
+  document.getElementById("btn-app").classList.toggle("active",v==="app");
+  document.getElementById("agv").classList.toggle("on",v==="app");
+  document.getElementById("chat-view").style.display="flex";
+  renderCV();
+  if(v==="app")renderAGV();
+}
+function togglePanel(w){if(ST.panel===w){closePanel();return;}ST.panel=w;document.getElementById("rpanel").classList.add("open");document.getElementById("ptitle").textContent=w==="dict"?"Dictionaries":"Settings";document.getElementById("dict-btn").classList.toggle("active",w==="dict");document.getElementById("set-btn").classList.toggle("active",w==="settings");renderPanel(w);}
+function closePanel(){ST.panel=null;document.getElementById("rpanel").classList.remove("open");document.getElementById("dict-btn").classList.remove("active");document.getElementById("set-btn").classList.remove("active");}
+function renderPanel(w){
+  var body=document.getElementById("pbody");
+  if(w==="dict"){
+    var dicts=[
+      {key:"ideaindex",name:"IDEAINDEX.txt",desc:"Community idea network.",col:"var(--violet-lt)"},
+      {key:"lockers",name:"LOCKERS.txt",desc:"Nonprofit locker mgmt.",col:"var(--violet-lt)"},
+      {key:"core",name:"CORE.txt",desc:"Default baseline.",col:"var(--gold)",locked:true},
+      {key:"urbanwolf",name:"URBANWOLF.txt",desc:"Urban infrastructure lens.",col:"var(--muted)"},
+      {key:"outlaw",name:"THEOUTLAW.txt",desc:"Radical privacy.",col:"var(--muted)"}
+    ];
+    body.innerHTML=dicts.map(function(d){var cc=d.locked?"locked":ST.dicts[d.key]?"on":"";var ct=d.locked||ST.dicts[d.key]?"&#x2713;":"";var oc=d.locked?"":'onclick="toggleDict(\''+d.key+'\')"';return'<div class="ditem" '+oc+'><div class="dchk-row"><div class="dchk '+cc+'">'+ct+'</div><div class="dnm" style="color:'+d.col+'">'+d.name+'</div></div><div class="ddesc">'+d.desc+'</div></div>';}).join("")
+      +'<div class="try-me"><span style="font-size:.9rem">&#x2728;</span><div><div class="try-text">Build your own dictionary</div><div class="try-sub">Create your language &middot; full release</div></div></div>';
+  } else {
+    body.innerHTML=['Voice input','Live suggestions','STARDUST code view','Auto-chain'].map(function(l){return'<div class="srow"><span class="slbl">'+l+'</span><button class="tog"></button></div>';}).join("");
+  }
+}
+function toggleDict(k){ST.dicts[k]=!ST.dicts[k];renderPanel("dict");}
+
+// ── RULE-BASED RESPONSES ─────────────────────────────────────────────────────
+window.ruleBasedResponse = function(cmd) {
+  var raw = cmd.trim();
+  var c = raw.toLowerCase();
+  var d = new Date();
+
+  // ── NORMALIZE: accept short aliases & abbreviations ─────────────────
+  // Maps common shorthands to canonical forms so matching is forgiving
+  function norm(s) {
+    // Step 1: expand abbreviations (order matters — no word can match its own replacement)
+    // protect already-expanded phrases first
+    var t = s
+      .replace(/mutual lockers/g, 'MLKR')
+      .replace(/mutual ideaindex/g, 'MIDX')
+      .replace(/civic chicago/g, 'CCHI')
+      .replace(/commerce starbucks/g, 'CSBUX')
+      .replace(/commerce united/g, 'CUNT');
+    t = t
+      // private node aliases
+      .replace(/\bdrv\b|\bdry\b/g, 'diary')
+      .replace(/\bdrm\b|\bdream\b/g, 'diary')
+      .replace(/\bdiay\b|\bdairy\b/g, 'diary')
+      // participant aliases
+      .replace(/\bprtc\b|\bprt\b|\bprsn\b|\bpersn\b|\bperson\b/g, 'part')
+      // domain shorthand → sentinel
+      .replace(/\blkr\b/g, 'MLKR')
+      .replace(/\blockers\b/g, 'MLKR')
+      .replace(/\bidx\b/g, 'MIDX')
+      .replace(/\bideaindex\b|\bideas\b/g, 'MIDX')
+      .replace(/\bchi\b(?!cago)/g, 'CCHI')
+      .replace(/\bsbux\b|\bstrbx\b|\bstarbuck\b/g, 'CSBUX')
+      .replace(/\bunt\b|\bunitd\b/g, 'CUNT')
+      // expand sentinels
+      .replace(/MLKR/g, 'mutual lockers')
+      .replace(/MIDX/g, 'mutual ideaindex')
+      .replace(/CCHI/g, 'civic chicago')
+      .replace(/CSBUX/g, 'commerce starbucks')
+      .replace(/CUNT/g, 'commerce united');
+    // Step 2: normalize action verbs AFTER expansions (so "add" isnt eaten by wrt rule)
+    // We keep both forms — just unify synonyms for matching
+    t = t
+      .replace(/\bcreate\b/g, 'add')
+      .replace(/\bnew\b/g, 'add')
+      .replace(/\bwrite\b/g, 'wrt')
+      .replace(/\brecord\b/g, 'wrt')
+      .replace(/\blog\b(?!in)/g, 'wrt');
+    return t;
+  }
+
+  var n = norm(c);  // normalized command
+
+  // ── CLARIFICATION HELPER ─────────────────────────────────────────────
+  // Returns a clarify response when we know the intent but need more info
+  function clarify(title, icon, color, question, options) {
+    return {type:'clarify', title:title, icon:icon, color:color,
+      question:question, options:options};
+  }
+
+  // ── VIEW LIST COMMANDS ───────────────────────────────────────────────
+  if (n.match(/mutual lockers part.*view|part.*view|view.*part|participant.*view|view.*participant/))
+    return {type:'list', title:'Participants', dataset:'lkr_participants'};
+  if (n.match(/mutual lockers inv.*view|inv.*view|view.*inv|inventory.*view|view.*locker/))
+    return {type:'list', title:'Locker Inventory', dataset:'lkr_inventory'};
+  if (n.match(/mutual ideaindex.*view|idea.*view|view.*idea/))
+    return {type:'list', title:'IdeaIndex · Ideas', dataset:'idx_ideas'};
+
+  // ── QUOTES & GRATITUDES ─────────────────────────────────────────────
+  if (n.match(/quote.*rand|rand.*quote|global.*quote/)) {
+    var q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
+    return {type:'quote', text:q.text, attr:q.attr, label:'Quote'};
+  }
+  if (n.match(/gratitude.*rand|rand.*grat|global.*grat/)) {
+    var g=GRATITUDES[Math.floor(Math.random()*GRATITUDES.length)];
+    return {type:'quote', text:g.text, attr:g.attr, label:'Gratitude'};
+  }
+
+  // ── PRIVATE DIARY / PERSONAL LOG ─────────────────────────────────────
+  // Matches: "diary wrt hello", "dry wrt hello", "self diary wrt hello", "prv diary hello"
+  if (n.match(/diary|lust|rage|trma|blf|lgcy/)) {
+    var nodeMap = {diary:'self.prv.diary',lust:'self.prv.lust',rage:'self.prv.rage',
+                   trma:'self.prv.trauma',blf:'self.prv.beliefs',lgcy:'self.prv.legacy'};
+    var nodeKey = Object.keys(nodeMap).find(function(k){return n.indexOf(k)>=0;}) || 'diary';
+    var storeKeyMap = {diary:'self_prv_diary',lust:'self_prv_lust',rage:'self_prv_rage',
+                       trma:'self_prv_trma',blf:'self_prv_blf',lgcy:'self_prv_lgcy'};
+    // Extract content: everything after the action word (wrt/log/add/write)
+    var content = raw.replace(/^(self\s+)?(home\s+)?(prv\s+)?(diary|lust|drm|dream|dry|drv|rage|trma|blf|lgcy)\s+(wrt|write|log|add|new)?\s*/i,'').trim();
+    // If no content, ask for it
+    if (!content) return clarify('What would you like to log?','📓','var(--teal)',
+      'Type your entry — it will be encrypted on this device only.',
+      ['diary wrt [your entry]','lust wrt [your feeling]','rage vent [your feeling]']);
+    return {type:'confirm', title:'Entry Logged', icon:'🔐', color:'var(--teal)',
+      fields:[
+        {key:'Node',    val:nodeMap[nodeKey]},
+        {key:'Content', val:content},
+        {key:'Encrypted',val:'AES-256 · device only'},
+        {key:'Server',  val:'none — private forever'},
+        {key:'Time',    val:d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})},
+      ],
+      storeKey:storeKeyMap[nodeKey], storeText:content,
+      note:'[ENTRY LOGGED · '+nodeMap[nodeKey]+' · encrypted]'};
+  }
+
+  // ── LOCKERS: ADD PARTICIPANT ─────────────────────────────────────────
+  // Matches: "mutual lockers part add john doe", "lkr new prtc john doe",
+  //          "lkr part add jane", "lockers add participant maria"
+  if (n.match(/mutual lockers.*(part|participant).*(add|wrt)|mutual lockers.*(add).*(part|participant)|(add).*(part|participant)|participant.*(add)/)) {
+    // Extract name: everything after the command tokens
+    var name = raw.replace(/^(mutual\s+lockers?|lkr)\s+/i,'')
+                  .replace(/^(part|participant|prtc|new|add|wrt)\s+/i,'')
+                  .replace(/^(part|participant|prtc|add|new|wrt)\s+/i,'')
+                  .trim();
+    if (!name) return clarify('Add Participant','👤','var(--violet)',
+      'What is the participant\'s name?',
+      ['mutual lockers part add [First Last]','lkr part add [name]']);
+    return {type:'confirm', title:'Participant Added', icon:'👤', color:'var(--violet)',
+      fields:[
+        {key:'Name',        val:name},
+        {key:'Status',      val:'Active'},
+        {key:'Requirements',val:'1 work date/locker/month'},
+        {key:'Meeting',     val:'1 per month required'},
+        {key:'Renewal due', val:'15th of each month'},
+        {key:'Added',       val:d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})},
+      ],
+      storeKey:'mut_lkr_part', storeText:name,
+      msg:'Participant added. Now assign a locker: `mutual lockers asgn new '+name+'`'};
+  }
+
+  // ── LOCKERS: ASSIGN ─────────────────────────────────────────────────
+  if (n.match(/mutual lockers.*asgn|lkr.*asgn|locker.*assign|assign.*locker/)) {
+    var name = raw.replace(/^(mutual\s+lockers?|lkr)\s+(asgn|assign)\s*(new\s*)?/i,'').trim();
+    var avail = DEMO.lkr_inventory.filter(function(l){return l.status==='available';});
+    var next = avail[0] || {id:'L??',size:'M'};
+    if (!name) return clarify('Assign Locker','🔑','var(--violet)',
+      'Which participant should receive '+next.id+'?',
+      ['mutual lockers asgn new [participant name]']);
+    return {type:'confirm', title:'Locker Assigned', icon:'🔑', color:'var(--violet)',
+      fields:[
+        {key:'Participant', val:name},
+        {key:'Locker',      val:next.id+' ('+next.size+')'},
+        {key:'Status',      val:'Assigned'},
+        {key:'Work date',   val:'Required by end of '+d.toLocaleString('en-US',{month:'long'})},
+      ],
+      storeKey:'mut_lkr_asgn', storeText:next.id+' → '+name,
+      msg:'Locker '+next.id+' assigned to '+name+'. Work date required this month.'};
+  }
+
+  // ── LOCKERS: CHECK IN ───────────────────────────────────────────────
+  if (n.match(/mutual lockers.*chk|lkr.*chk|locker.*check.?in|check.?in.*locker/)) {
+    var name = raw.replace(/^(mutual\s+lockers?|lkr)\s+(chk|check).?(in)?\s*/i,'').trim();
+    if (!name) return clarify('Check In','✅','var(--teal)',
+      'Which participant is checking in?',
+      ['mutual lockers chk in [name]','lkr chk in [name]']);
+    return {type:'confirm', title:'Checked In', icon:'✅', color:'var(--teal)',
+      fields:[
+        {key:'Participant', val:name},
+        {key:'Type',        val:'Locker access'},
+        {key:'Date',        val:d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},
+        {key:'Time',        val:d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})},
+        {key:'Monthly',     val:'1 of 1 required meetings'},
+      ],
+      storeKey:'mut_lkr_chk', storeText:'Check-in: '+name,
+      msg:'Checked in. Recorded for '+d.toLocaleString('en-US',{month:'long'})+'.'};
+  }
+
+  // ── LOCKERS: EC BAR ─────────────────────────────────────────────────
+  if (n.match(/mutual lockers.*bar.*ec|lkr.*bar.*ec|locker.*bar|ec.*bar/)) {
+    var name = raw.replace(/^(mutual\s+lockers?|lkr)\s+(bar)\s+(ec\s*)?/i,'').trim();
+    var exp = new Date(d.getTime()+30*86400000);
+    if (!name) return clarify('Issue EC Bar','🚫','var(--rose-lt)',
+      'Which participant receives the 30-day bar?',
+      ['mutual lockers bar ec [name]']);
+    return {type:'confirm', title:'EC Bar Issued', icon:'🚫', color:'#FDA4AF',
+      fields:[
+        {key:'Participant', val:name},
+        {key:'Type',        val:'EC Bar (30 days)'},
+        {key:'Issued',      val:d.toLocaleDateString('en-US',{month:'short',day:'numeric'})},
+        {key:'Expires',     val:exp.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},
+        {key:'History',     val:'Permanent record kept'},
+      ],
+      storeKey:'mut_lkr_bar', storeText:'EC bar: '+name,
+      msg:'EC bar issued. Auto-expires '+exp.toLocaleDateString('en-US',{month:'short',day:'numeric'})+'.'};
+  }
+
+  // ── LOCKERS: RENEWAL LIST ───────────────────────────────────────────
+  if (n.match(/mutual lockers.*rnw|lkr.*rnw|locker.*renew/)) {
+    var day15=new Date(d.getFullYear(),d.getMonth(),15);
+    var days=Math.ceil((day15-d)/86400000);
+    return {type:'confirm', title:'Renewal Status', icon:'📅', color:'var(--amber-lt)',
+      fields:[
+        {key:'Deadline',    val:'15th of '+d.toLocaleString('en-US',{month:'long'})},
+        {key:'Days left',   val:days>0?days+' days':'Past deadline'},
+        {key:'Active',      val:DEMO.lkr_participants.filter(function(p){return p.status==='active';}).length+' participants'},
+        {key:'Inactive',    val:DEMO.lkr_participants.filter(function(p){return p.status==='inactive';}).length+' participants'},
+        {key:'Full list',   val:'Use `mutual lockers part view`'},
+      ],
+      msg:days>0?'Renewal deadline in '+days+' days.':'Deadline passed. Run `mutual lockers rnw rel`.'};
+  }
+
+  // ── LOCKERS: MISSED WORK DATE ───────────────────────────────────────
+  if (n.match(/mutual lockers.*wkd.*miss|lkr.*wkd.*miss|locker.*miss|miss.*work.*date/)) {
+    var name = raw.replace(/^(mutual\s+lockers?|lkr)\s+(wkd\s+)?miss\s*/i,'').trim();
+    if (!name) return clarify('Flag Missed Work Date','⚠','var(--amber-lt)',
+      'Which participant missed their work date?',
+      ['mutual lockers wkd miss [name]']);
+    return {type:'confirm', title:'Missed Work Date', icon:'⚠', color:'var(--amber-lt)',
+      fields:[
+        {key:'Participant', val:name},
+        {key:'Window',      val:'14 days to reschedule'},
+        {key:'Deadline',    val:new Date(d.getTime()+14*86400000).toLocaleDateString('en-US',{month:'short',day:'numeric'})},
+        {key:'Consequence', val:'30-day bar if not resolved'},
+      ],
+      storeKey:'mut_lkr_wkd', storeText:'Missed: '+name,
+      msg:name+' flagged. They have 14 days to pick a replacement date.'};
+  }
+
+  // ── IDEAINDEX: NEW IDEA ─────────────────────────────────────────────
+  if (n.match(/mutual ideaindex.*idea.*wrt|mutual ideaindex.*idea.*add|idx.*idea.*wrt|idea.*new|new.*idea|post.*idea/)) {
+    var ideaStart = raw.search(/\b(wrt|add|new|post)\b/i);
+    var idea = ideaStart>=0 ? raw.slice(ideaStart).replace(/^(wrt|add|new|post)\s+/i,'').trim() : '';
+    if (!idea) return clarify('New Idea','✨','var(--violet-lt)',
+      'What is your idea?',
+      ['mutual ideaindex idea wrt [your idea]','idx idea wrt [idea text]']);
+    return {type:'confirm', title:'Idea Posted', icon:'✨', color:'var(--violet-lt)',
+      fields:[
+        {key:'Idea',        val:idea},
+        {key:'Visibility',  val:'Private (publish with `idx pub idea`)'},
+        {key:'Votes',       val:'0 · 1 vote per person globally'},
+        {key:'Posted',      val:d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})},
+      ],
+      storeKey:'mut_idx_idea', storeText:idea,
+      msg:'Idea saved. Share it globally: `mutual ideaindex pub idea`.'};
+  }
+
+  // ── GOAL ────────────────────────────────────────────────────────────
+  if (n.match(/goal.*wrt|goal.*add|goal.*new|new.*goal|add.*goal|self.*goal/)) {
+    var goalStart = raw.search(/\b(wrt|add|new|create)\b/i);
+    var goal = goalStart>=0 ? raw.slice(goalStart).replace(/^(wrt|add|new|create)\s+/i,'').trim() : '';
+    if (!goal) return clarify('New Goal','🎯','var(--gold)',
+      'What is your goal?',
+      ['self goal wrt [your goal]','goal new [description]']);
+    return {type:'confirm', title:'Goal Created', icon:'🎯', color:'var(--gold-soft)',
+      fields:[
+        {key:'Goal',        val:goal},
+        {key:'Created',     val:d.toLocaleDateString('en-US',{month:'short',day:'numeric'})},
+        {key:'Track',       val:'View in App view → Self → Planning → Goals'},
+      ],
+      storeKey:'self_pln_goal', storeText:goal,
+      msg:'Goal created. Set a deadline: `self goal deadline [date]`.'};
+  }
+
+  // ── COMMERCE: UNITED FLIGHT ─────────────────────────────────────────
+  if (n.match(/commerce united.*ticket|united.*buy.*ticket|united.*fly|buy.*ticket.*air|flight.*ticket/)) {
+    var price = Math.floor(Math.random()*100+180);
+    var route = c.match(/([a-z]{3})\s*(to|-|→)\s*([a-z]{3})/i);
+    var routeStr = route ? route[1].toUpperCase()+' → '+route[3].toUpperCase() : null;
+    if (!routeStr) return clarify('Buy Flight','✈','var(--amber-lt)',
+      'What route and constraints?',
+      ['commerce united buy ticket air LAX SFO after5pm under300',
+       'commerce united buy ticket air ORD LAX']);
+    return {type:'confirm', title:'Flight Found', icon:'✈', color:'var(--amber-lt)',
+      fields:[
+        {key:'Route',   val:routeStr},
+        {key:'Departs', val:'7:45 PM'},
+        {key:'Arrives', val:'9:20 PM'},
+        {key:'Price',   val:'$'+price},
+        {key:'Class',   val:'Economy'},
+        {key:'Result',  val:'1 of 1 · One-Match Engine'},
+      ],
+      msg:'One flight found. Confirm to book?'};
+  }
+
+  // ── COMMERCE: STARBUCKS ─────────────────────────────────────────────
+  if (n.match(/commerce starbucks|starbucks.*buy|starbucks.*order|sbux.*buy|sbux.*order/)) {
+    var order = raw.replace(/^(commerce\s+)?starbucks\s+(buy\s+)?(delivery\s+|rapid\s+|table\s+)?/i,'').trim();
+    if (!order) return clarify('Starbucks Order','☕','var(--amber-lt)',
+      'What would you like to order?',
+      ['commerce starbucks buy delivery latte iced venti',
+       'commerce starbucks buy rapid americano grande']);
+    var price = n.match(/venti/)?"$7.45":n.match(/grande/)?"$6.45":"$5.95";
+    return {type:'confirm', title:'Order Placed', icon:'☕', color:'var(--amber-lt)',
+      fields:[
+        {key:'Order',   val:order},
+        {key:'Type',    val:n.match(/delivery/)?'Delivery':'Rapid pickup'},
+        {key:'ETA',     val:'18-25 minutes'},
+        {key:'Total',   val:price},
+        {key:'Rewards', val:'+50 stars'},
+      ],
+      msg:'Order confirmed. Estimated '+( n.match(/delivery/)?'18-25 min delivery.':'15 min pickup.')};
+  }
+
+  // ── CIVIC CHICAGO REPORT ────────────────────────────────────────────
+  if (n.match(/civic chicago.*report|chicago.*report|report.*pothole|report.*light|report.*city/)) {
+    var issue = n.match(/pothole/)?"Pothole Repair":
+                n.match(/light/)?"Light Outage":
+                n.match(/snow/)?"Snow Removal":"Service Issue";
+    var words = raw.split(/\s+/);
+    var location = words.slice(5).join(' ').trim();
+    if (!location) return clarify('Report City Issue','🏛','var(--sky-lt)',
+      'What and where?',
+      ['civic chicago resident report pothole [cross streets]',
+       'civic chicago resident report light [address]']);
+    return {type:'confirm', title:'Report Submitted', icon:'🏛', color:'var(--sky-lt)',
+      fields:[
+        {key:'Type',     val:issue},
+        {key:'Location', val:location},
+        {key:'Ticket #', val:'CHI-'+Math.floor(Math.random()*90000+10000)},
+        {key:'Filed',    val:d.toLocaleDateString('en-US',{month:'short',day:'numeric'})},
+        {key:'Response', val:'3-5 business days'},
+      ],
+      storeKey:'civ_chi_res', storeText:issue+' at '+location,
+      msg:'Submitted to City of Chicago. Keep your ticket number.'};
+  }
+
+  // ── UNKNOWN: ask clarifying question ───────────────────────────────
+  return {type:'unknown', msg:raw};
+};
+
+// ── MESSAGE RENDERING ─────────────────────────────────────────────────────────
+function buildConfBox(resp) {
+  var t = nodeType(ST.node);
+  var borderCol = resp.color || domainColor(t,"top");
+  var h = '<div class="conf-box" style="border-left-color:'+borderCol+'">'
+    +'<div class="conf-title" style="color:'+borderCol+'">'+resp.icon+' &nbsp;'+resp.title+'</div>';
+  (resp.fields||[]).forEach(function(f){
+    h+='<div class="conf-row"><span class="conf-key">'+f.key+'</span><span class="conf-val">'+sH(String(f.val||""))+'</span></div>';
+  });
+  if(resp.note){h+='<div class="conf-node">&#x2736; '+sH(resp.note)+'</div>';}
+  if(resp.msg){h+='<div style="font-size:.78rem;color:var(--muted);margin-top:.45rem;padding-top:.45rem;border-top:1px solid var(--border2)">'+sH(resp.msg)+'</div>';}
+  h+='</div>';
+  return h;
+}
+
+function buildListBox(resp) {
+  var ds = DEMO[resp.dataset];
+  if(!ds||!ds.length) return '<div style="font-size:.8rem;color:var(--muted);margin-top:.5rem">No data found.</div>';
+  var h = '<div class="list-box"><div class="list-header"><span class="list-title">'+resp.title+'</span><span class="list-count">'+ds.length+' records</span></div>';
+
+  if(resp.dataset==="lkr_participants"){
+    ds.forEach(function(p,i){
+      var bc=p.status==="active"?"badge-active":p.status==="barred"?"badge-broken":"badge-inactive";
+      h+='<div class="list-row"><span class="list-idx">'+(i+1)+'</span><div style="flex:1"><div class="list-main">'+sH(p.name)+'</div><div class="list-sub">Lockers: '+sH(p.lockers.join(", "))+" &middot; Wkd: "+sH(p.wkd)+"</div>"+(p.reason?'<div class="list-sub" style="color:var(--amber-lt)">'+sH(p.reason)+'</div>':"")+'</div><span class="list-badge '+bc+'">'+sH(p.status)+'</span></div>';
+    });
+  } else if(resp.dataset==="lkr_inventory"){
+    ds.forEach(function(l,i){
+      var bc=l.status==="available"?"badge-avail":l.status==="broken"?"badge-broken":"badge-taken";
+      h+='<div class="list-row"><span class="list-idx">'+sH(l.id)+'</span><div style="flex:1"><div class="list-main">'+sH(l.status==="taken"?"Occupied — "+(l.occupant||""):l.status.charAt(0).toUpperCase()+l.status.slice(1))+'</div><div class="list-sub">Size: '+sH(l.size)+'</div></div><span class="list-badge '+bc+'">'+sH(l.status)+'</span></div>';
+    });
+  } else if(resp.dataset==="idx_ideas"){
+    ds.forEach(function(idea,i){
+      h+='<div class="list-row"><span class="list-idx">'+(i+1)+'</span><div style="flex:1"><div class="list-main">'+sH(idea.title)+'</div><div class="list-sub">'+sH(idea.author)+' &middot; tags: '+sH(idea.tags.join(", "))+'</div></div><span class="list-badge badge-active" style="color:var(--teal-lt)">&#x25B2; '+sH(String(idea.votes))+'</span></div>';
+    });
+  }
+  h+='</div>';
+  return h;
+}
+
+function buildQuoteBox(resp) {
+  return '<div class="quote-box">'
+    +'<div style="font-family:JetBrains Mono,monospace;font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;color:var(--emerald-lt);margin-bottom:.5rem">'+resp.label+'</div>'
+    +'<div class="quote-text">&ldquo;'+sH(resp.text)+'&rdquo;</div>'
+    +'<div class="quote-attr">&mdash; '+sH(resp.attr)+'</div>'
+    +'</div>';
+}
+
+// ── CHAT ─────────────────────────────────────────────────────────────────────
+window.addMsg = function(role, html) {
+  var empty=document.getElementById("empty");if(empty)empty.remove();
+  var c=document.getElementById("msgs"); var div=document.createElement("div"); div.className="msg";
+  var t=nodeType(ST.node);
+  var avc=role==="user"?"user":domainColor(t,"ava");
+  var avl=role==="user"?"U":"S";
+  var nm=role==="user"?"You":"Sage \u00B7 STARDUST";
+  div.innerHTML='<div class="ava '+avc+'">'+avl+'</div><div class="mcon"><div class="mname">'+nm+'</div><div class="mtxt'+(role==="user"?" u":"")+'">'+html+'</div></div>';
+  c.appendChild(div); c.scrollTop=c.scrollHeight;
+};
+function addLoading(){var c=document.getElementById("msgs");var div=document.createElement("div");div.className="msg";div.id="ldg";div.innerHTML='<div class="ava sage">S</div><div class="mcon"><div class="mname">Sage \u00B7 STARDUST</div><div class="mtxt"><div class="dots"><span class="dot" style="animation:dot 1.2s 0s ease-in-out infinite"></span><span class="dot" style="animation:dot 1.2s .2s ease-in-out infinite"></span><span class="dot" style="animation:dot 1.2s .4s ease-in-out infinite"></span></div></div></div>';c.appendChild(div);c.scrollTop=c.scrollHeight;}
+function removeLoading(){var e=document.getElementById("ldg");if(e)e.remove();}
+
+function storeEnt(key,text,tag){
+  if(!key)return;
+  if(!ST.entries[key])ST.entries[key]=[];
+  ST.entries[key].unshift({
+    ts:new Date().toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}),
+    node:key.replace(/_/g,"."), tag:tag||null, text:text||""
+  });
+}
+
+// ── SEND ─────────────────────────────────────────────────────────────────────
+function send(){
+  var box=document.getElementById("ibox"); var val=box.value.trim(); if(!val)return;
+  hideSugs(); box.value=""; box.style.height="auto"; document.getElementById("sbtn").disabled=true;
+  var t=nodeType(ST.node); var cc=domainColor(t,"tc");
+  window.addMsg("user",'<span class="mcmd" style="color:'+cc+';background:rgba(0,0,0,.2);border-color:'+cc+'40">'+sH(val)+'</span>');
+  autoNav(val); addLoading();
+
+  // Small delay for UX
+  setTimeout(function(){
+    removeLoading();
+    var resp = window.ruleBasedResponse(val);
+
+    // Store entry if applicable
+    if(resp.storeKey) storeEnt(resp.storeKey, resp.storeText, resp.title||null);
+
+    var html = "";
+    if(resp.type==="confirm"){
+      html = buildConfBox(resp);
+    } else if(resp.type==="list"){
+      html = '<div style="font-size:.82rem;color:var(--body);margin-bottom:.45rem">Here are the current records:</div>'+buildListBox(resp);
+    } else if(resp.type==="quote"){
+      html = buildQuoteBox(resp);
+    } else if(resp.type==="clarify"){
+      // Ask for more info with clickable option chips
+      var bCol = resp.color||"var(--teal)";
+      html = '<div class="conf-box" style="border-left-color:'+bCol+'">'+
+        '<div class="conf-title" style="color:'+bCol+'">'+safeH(resp.icon||"?")+' &nbsp;'+safeH(resp.title)+'</div>'+
+        '<div style="font-size:.83rem;color:var(--body);margin-bottom:.65rem">'+safeH(resp.question)+'</div>'+
+        '<div style="display:flex;flex-direction:column;gap:.32rem">'+
+        (resp.options||[]).map(function(o){
+          return '<div onclick="useChip(this.dataset.cmd)" data-cmd="'+safeH(o)+'" style="font-family:JetBrains Mono,monospace;font-size:.72rem;color:var(--teal-lt);background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.22);border-radius:5px;padding:.38rem .75rem;cursor:pointer">'+safeH(o)+'</div>';
+        }).join("")+'</div></div>';
+    } else if(resp.type==="unknown"){
+      var topHits = scoreAll(resp.msg).filter(function(r){return r.score>0.1;}).slice(0,3);
+      html = '<div style="font-size:.82rem;color:var(--body);line-height:1.75">Command not recognized.';
+      if(topHits.length){
+        html += ' Did you mean:<br><br>'+topHits.map(function(r){
+          return '&nbsp;&nbsp;<span data-cmd="'+safeH(r.cmd)+'" onclick="useChip(this.dataset.cmd)" class="mcmd" style="cursor:pointer;display:inline-block;margin-bottom:.22rem">'+safeH(r.cmd)+'</span> <span style="color:var(--muted);font-size:.75rem">'+safeH(r.desc)+'</span>';
+        }).join("<br>");
+      } else {
+        html += '<br>Try typing partial words — suggestions appear as you type.';
+      }
+      html += '</div>';
+    } else {
+      html = '<div style="font-size:.82rem;color:var(--body);line-height:1.7">'+safeH(resp.msg||"Done.").replace(/`([^`]+)`/g,'<span class="mcmd">$1</span>').replace(/\n/g,"<br>")+'</div>';
+    }
+
+    // Ambient node hint if result came from different node
+    if(resp.sourceNode && resp.sourceNode !== ST.node){
+      html += '<div style="font-size:.72rem;color:var(--amber-lt);opacity:.7;margin-top:.38rem;font-family:JetBrains Mono,monospace">&#x2190; found in '+resp.sourceNode+'</div>';
+    }
+
+    window.addMsg("sage", html);
+    if(ST.view==="app") renderAGV(); else if(resp.type==="confirm"||resp.type==="list") { /* chat shows conf box */ }
+  }, 320);
+
+  document.getElementById("sbtn").disabled=false;
+}
+
+// ── SUGGESTIONS ────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════
+// STARDUST SMART INPUT ENGINE
+// Hybrid: subsequence + word-partial + fuzzy (Levenshtein) + abbreviation
+// Handles: partials, typos, out-of-order letters, abbreviations
+// ═══════════════════════════════════════════════════════════════════
+
+var ALL_CMDS = [
+  // Self
+  {cmd:"self diary wrt",      desc:"Write private diary entry",      key:"self_prv_diary",  domain:"self"},
+  {cmd:"self diary read",     desc:"Read diary entries",             key:"self_prv_diary",  domain:"self"},
+  {cmd:"self lust log",       desc:"Log private feeling",            key:"self_prv_lust",   domain:"self"},
+  {cmd:"self drm log",        desc:"Record a dream",                 key:"self_prv_drm",    domain:"self"},
+  {cmd:"self rage vent",      desc:"Release into vault",             key:"self_prv_rage",   domain:"self"},
+  {cmd:"self goal new",       desc:"Create a new goal",              key:"self_pln_goal",   domain:"self"},
+  {cmd:"self goal view",      desc:"View my goals",                  key:"self_pln_goal",   domain:"self"},
+  {cmd:"self evnt add",       desc:"Add an event",                   key:"self_pln_evnt",   domain:"self"},
+  {cmd:"self evnt view",      desc:"View events",                    key:"self_pln_evnt",   domain:"self"},
+  {cmd:"self trvl plan",      desc:"Plan a trip",                    key:"self_pln_trvl",   domain:"self"},
+  {cmd:"self cal add",        desc:"Add to calendar",                key:"self_pln_cal",    domain:"self"},
+  {cmd:"self frnd add",       desc:"Add a friend",                   key:"self_soc_frnd",   domain:"self"},
+  {cmd:"self frnd view",      desc:"View friends",                   key:"self_soc_frnd",   domain:"self"},
+  {cmd:"self knw cap",        desc:"Capture a thought",              key:"self_knw_cap",    domain:"self"},
+  {cmd:"self home util track",desc:"Track utility",                  key:"self_home_util",  domain:"self"},
+  {cmd:"self home rsrc add",  desc:"Add home resource",              key:"self_home_rsrc",  domain:"self"},
+  {cmd:"self fin bnk view",   desc:"View bank balance",              key:"self_fin_bnk",    domain:"self"},
+  // Mutual · Lockers
+  {cmd:"mutual lockers part add",  desc:"Add new participant",        key:"mut_lkr_part",  domain:"mutual"},
+  {cmd:"mutual lockers part view", desc:"View all participants",      key:"mut_lkr_part",  domain:"mutual"},
+  {cmd:"mutual lockers part find", desc:"Find participant by name",   key:"mut_lkr_part",  domain:"mutual"},
+  {cmd:"mutual lockers inv view",   desc:"View locker inventory",      key:"mut_lkr_inv",    domain:"mutual"},
+  {cmd:"mutual lockers inv fix",    desc:"Mark locker broken/fixed",   key:"mut_lkr_inv",    domain:"mutual"},
+  {cmd:"mutual lockers chk in",     desc:"Check-in participant",       key:"mut_lkr_chk",    domain:"mutual"},
+  {cmd:"mutual lockers chk wkd",    desc:"Record work date",           key:"mut_lkr_chk",    domain:"mutual"},
+  {cmd:"mutual lockers chk mtg",    desc:"Record meeting attendance",  key:"mut_lkr_chk",    domain:"mutual"},
+  {cmd:"mutual lockers asgn new",   desc:"Assign available locker",    key:"mut_lkr_asgn",   domain:"mutual"},
+  {cmd:"mutual lockers asgn un",    desc:"Unassign locker",            key:"mut_lkr_asgn",   domain:"mutual"},
+  {cmd:"mutual lockers bar ec",     desc:"Issue 30-day EC bar",        key:"mut_lkr_bar",    domain:"mutual"},
+  {cmd:"mutual lockers bar perm",   desc:"Issue permanent bar",        key:"mut_lkr_bar",    domain:"mutual"},
+  {cmd:"mutual lockers bar end",    desc:"End / appeal bar",           key:"mut_lkr_bar",    domain:"mutual"},
+  {cmd:"mutual lockers bar view",   desc:"View bar history",           key:"mut_lkr_bar",    domain:"mutual"},
+  {cmd:"mutual lockers rnw list",   desc:"Renewals due by 15th",       key:"mut_lkr_rnw",    domain:"mutual"},
+  {cmd:"mutual lockers rnw do",     desc:"Process a renewal",          key:"mut_lkr_rnw",    domain:"mutual"},
+  {cmd:"mutual lockers wkd miss",   desc:"Flag missed work date",      key:"mut_lkr_wkd",    domain:"mutual"},
+  {cmd:"mutual lockers wkd asgn",   desc:"Assign work date",           key:"mut_lkr_wkd",    domain:"mutual"},
+  {cmd:"mutual lockers att take",   desc:"Take attendance",            key:"mut_lkr_att",     domain:"mutual"},
+  {cmd:"mutual lockers rpt daily",  desc:"Daily report",               key:"mut_lkr_rpt",    domain:"mutual"},
+  {cmd:"mutual lockers rpt status", desc:"Status report",              key:"mut_lkr_rpt",    domain:"mutual"},
+  {cmd:"mutual lockers msg new",    desc:"Send message",               key:"mut_lkr_msg",    domain:"mutual"},
+  {cmd:"mutual lockers msg brd",    desc:"Broadcast to all",           key:"mut_lkr_msg",    domain:"mutual"},
+  // Mutual · IdeaIndex
+  {cmd:"mutual ideaindex idea new",  desc:"Post a new idea",           key:"mut_idx_idea",   domain:"mutual"},
+  {cmd:"mutual ideaindex idea view", desc:"View all ideas",            key:"mut_idx_idea",   domain:"mutual"},
+  {cmd:"mutual ideaindex disc top",  desc:"Top ideas globally",        key:"mut_idx_disc",   domain:"mutual"},
+  {cmd:"mutual ideaindex disc srch", desc:"Search ideas",              key:"mut_idx_disc",   domain:"mutual"},
+  {cmd:"mutual ideaindex vote up",   desc:"Upvote idea (1 per)",       key:"mut_idx_vote",   domain:"mutual"},
+  {cmd:"mutual ideaindex jnl share", desc:"Share journal with connections", key:"mut_idx_jnl", domain:"mutual"},
+  {cmd:"mutual ideaindex collab req",desc:"Request collaboration",     key:"mut_idx_collab", domain:"mutual"},
+  {cmd:"mutual ideaindex ldr top",   desc:"Top leaders",               key:"mut_idx_ldr",    domain:"mutual"},
+  // Civic · Chicago
+  {cmd:"civic chicago resident report",  desc:"Report city issue (pothole, light, etc)", key:"civ_chi_res", domain:"civic"},
+  {cmd:"civic chicago resident request", desc:"Request city service",   key:"civ_chi_res",    domain:"civic"},
+  {cmd:"civic chicago resident apply",   desc:"Apply for city work",    key:"civ_chi_res",    domain:"civic"},
+  {cmd:"civic chicago developer submit", desc:"Submit permit",          key:"civ_chi_dev",    domain:"civic"},
+  {cmd:"civic chicago election vote",    desc:"Voter registration info",key:"civ_chi_elec",   domain:"civic"},
+  {cmd:"civic chicago election search",  desc:"Search candidates",      key:"civ_chi_elec",   domain:"civic"},
+  {cmd:"civic chicago bounty register",  desc:"Register as enforcer",   key:"civ_chi_enf",    domain:"civic"},
+  {cmd:"civic chicago bounty issue",     desc:"Issue a ticket",         key:"civ_chi_enf",    domain:"civic"},
+  {cmd:"civic chicago shovelaid request",desc:"Request snow removal",   key:"civ_chi_shovel", domain:"civic"},
+  {cmd:"civic chicago search permits",   desc:"Search city permits",    key:"civ_chi_srch",   domain:"civic"},
+  {cmd:"civic chicago search jobs",      desc:"Search city jobs",       key:"civ_chi_srch",   domain:"civic"},
+  // Commerce · United
+  {cmd:"commerce united buy ticket air",  desc:"Buy flight ticket",     key:"com_ua_buy",     domain:"commerce"},
+  {cmd:"commerce united search route",    desc:"Search flight routes",  key:"com_ua_srch",    domain:"commerce"},
+  {cmd:"commerce united search price",    desc:"Search flight prices",  key:"com_ua_srch",    domain:"commerce"},
+  {cmd:"commerce united modify trip",     desc:"Modify existing trip",  key:"com_ua_mod",     domain:"commerce"},
+  {cmd:"commerce united modify date",     desc:"Change flight date",    key:"com_ua_mod",     domain:"commerce"},
+  {cmd:"commerce united modify bag",      desc:"Add baggage",           key:"com_ua_mod",     domain:"commerce"},
+  // Commerce · Starbucks
+  {cmd:"commerce starbucks buy delivery", desc:"Order delivery",        key:"com_sbux_buy",   domain:"commerce"},
+  {cmd:"commerce starbucks buy rapid",    desc:"Order rapid pickup",    key:"com_sbux_buy",   domain:"commerce"},
+  {cmd:"commerce starbucks buy table",    desc:"Order to table",        key:"com_sbux_buy",   domain:"commerce"},
+  {cmd:"commerce starbucks request remake",desc:"Request remake",       key:"com_sbux_req",   domain:"commerce"},
+  {cmd:"commerce starbucks search rewards",desc:"Check rewards",        key:"com_sbux_srch",  domain:"commerce"},
+  // Global
+  {cmd:"global quote random",     desc:"Random inspirational quote",    key:"glb_quote",      domain:"global"},
+  {cmd:"global gratitude random", desc:"Random gratitude entry",        key:"glb_grat",       domain:"global"},
+  {cmd:"global people find",      desc:"Learn about a person",          key:"glb_people",     domain:"global"},
+  {cmd:"global places find",      desc:"Explore a place",               key:"glb_places",     domain:"global"},
+  {cmd:"global countries find",   desc:"Learn about a country",         key:"glb_countries",  domain:"global"},
+  {cmd:"global animals find",     desc:"Learn about an animal",         key:"glb_animals",    domain:"global"},
+  // Universal
+  {cmd:"universal planets find",  desc:"Learn about a planet",          key:"uni_planets",    domain:"universal"},
+  {cmd:"universal stars find",    desc:"Learn about a star",            key:"uni_stars",      domain:"universal"},
+  {cmd:"universal forces find",   desc:"Learn about a physical force",  key:"uni_forces",     domain:"universal"},
+  {cmd:"universal elements find", desc:"Learn about an element",        key:"uni_elements",   domain:"universal"},
+];
+
+// ── SCORING FUNCTIONS ───────────────────────────────────────────────
+
+function lev(a, b) {
+  // Levenshtein distance
+  a = a.toLowerCase(); b = b.toLowerCase();
+  if (a.length < b.length) { var tmp=a;a=b;b=tmp; }
+  if (b.length === 0) return a.length;
+  var prev = Array.from({length:b.length+1},function(_,i){return i;});
+  for (var i=0;i<a.length;i++){
+    var curr = [i+1];
+    for (var j=0;j<b.length;j++){
+      curr.push(Math.min(prev[j+1]+1, curr[j]+1, prev[j]+(a[i]!==b[j]?1:0)));
+    }
+    prev = curr;
+  }
+  return prev[b.length];
+}
+
+function seqScore(q, target) {
+  // Subsequence: q chars appear in order in target
+  q = q.toLowerCase(); target = target.toLowerCase();
+  var qi=0, bonus=0;
+  for (var i=0;i<target.length && qi<q.length;i++){
+    if (target[i]===q[qi]){
+      if (i===0||target[i-1]===' ') bonus+=0.08;
+      qi++;
+    }
+  }
+  if (qi < q.length) return 0;
+  return Math.min(1, q.length/Math.max(target.length,1) + bonus);
+}
+
+function wordScore(q, target) {
+  // Each query word must partially match some target word
+  var qw=q.toLowerCase().split(/\s+/).filter(Boolean);
+  var tw=target.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!qw.length) return 0;
+  var matched=0;
+  for (var i=0;i<qw.length;i++){
+    var best=0;
+    for (var j=0;j<tw.length;j++){
+      if (tw[j]===qw[i]) best=Math.max(best,1.0);
+      else if (tw[j].indexOf(qw[i])===0||qw[i].indexOf(tw[j])===0) best=Math.max(best,0.85);
+      else if (tw[j].indexOf(qw[i])>=0) best=Math.max(best,0.7);
+    }
+    matched+=best;
+  }
+  return matched/qw.length;
+}
+
+function fuzzyScore(q, target) {
+  var qw=q.toLowerCase().split(/\s+/).filter(Boolean);
+  var tw=target.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!qw.length||!tw.length) return 0;
+  var total=0;
+  for (var i=0;i<qw.length;i++){
+    var best=tw.reduce(function(mn,t){return Math.min(mn,lev(qw[i],t));},999);
+    total+=Math.max(0,1-best/Math.max(qw[i].length,1));
+  }
+  return total/qw.length;
+}
+
+function abbrevScore(q, target) {
+  // Match q as initials of target words
+  var q2=q.toLowerCase().replace(/\s/g,'');
+  var words=target.toLowerCase().split(/\s+/).filter(Boolean);
+  var initials=words.map(function(w){return w[0]||'';}).join('');
+  var qi=0;
+  for (var i=0;i<initials.length && qi<q2.length;i++){
+    if (initials[i]===q2[qi]) qi++;
+  }
+  return qi/Math.max(q2.length,1);
+}
+
+function hybridScore(q, cmd, desc) {
+  var target = (cmd+' '+desc).trim();
+  var tl = target.toLowerCase();
+  var ql = q.toLowerCase().trim();
+
+  // Exact prefix = strongest signal
+  if (tl.startsWith(ql)) return 1.0 + (1/Math.max(tl.length,1)); // sort exact first
+
+  var ss = seqScore(ql, target);
+  var ws = wordScore(ql, target);
+  var fz = fuzzyScore(ql, target);
+  var ab = abbrevScore(ql, target);
+
+  // Detect abbreviation style (short, consonant-heavy, no spaces)
+  var vowels = (ql.match(/[aeiou]/g)||[]).length;
+  var looksAbbrev = ql.length<=6 || (ql.indexOf(' ')<0 && vowels < ql.length*0.35);
+
+  var score;
+  if (looksAbbrev) {
+    score = ab*0.45 + ss*0.25 + ws*0.2 + fz*0.1;
+  } else {
+    score = ss*0.35 + ws*0.35 + fz*0.2 + ab*0.1;
+  }
+
+  // Bonus if any query word starts a target word
+  var qw = ql.split(/\s+/).filter(Boolean);
+  var tw = tl.split(/\s+/).filter(Boolean);
+  qw.forEach(function(qword){
+    tw.forEach(function(tword){
+      if (tword.startsWith(qword) && qword.length>=2) score+=0.08;
+    });
   });
 
-  const data = await response.json();
-  const reply = data.content?.[0]?.text || 'Something went wrong.';
-  conversationHistory.push({ role: 'assistant', content: reply });
-  return reply;
+  return Math.min(0.999, score); // cap below exact prefix
 }
 
-// ── TREE RENDER ────────────────────────────────────────────────────────────
-function renderTree() {
-  const list = document.getElementById('tree-list');
-  const rootChildren = TREE.root.children;
+// ── ZERO-MATCH ANALYSIS ─────────────────────────────────────────────
+function analyzeZeroMatch(q) {
+  var tokens = q.trim().split(/\s+/).filter(Boolean);
+  var suggestions = [];
 
-  let html = '';
-  // Root
-  html += `<div class="tree-node ${STATE.activeNode==='root'?'active':''}" onclick="navTo('root')">
-    <span class="node-icon">✦</span> Sage <span class="node-cmd">~</span>
-  </div>`;
+  if (tokens.length <= 1) {
+    // Single token, no removal possible — suggest closest command
+    var closest = ALL_CMDS.map(function(c){
+      return {cmd:c.cmd, desc:c.desc, score:hybridScore(q,c.cmd,c.desc)};
+    }).sort(function(a,b){return b.score-a.score;}).slice(0,3);
+    return {type:'closest', items:closest, removedToken:null};
+  }
 
-  rootChildren.forEach(domainKey => {
-    const domain = TREE[domainKey];
-    const isActive = STATE.activeNode === domainKey || STATE.activeNode.startsWith(domainKey+'_');
-    html += `<div class="tree-node child ${STATE.activeNode===domainKey?'active':''}" onclick="navTo('${domainKey}')">
-      <span class="node-icon">${domain.icon}</span> ${domain.label}
-      <span class="node-cmd">${domain.cmd}</span>
-    </div>`;
-    if (isActive && domain.children.length) {
-      domain.children.forEach(childKey => {
-        const child = TREE[childKey];
-        html += `<div class="tree-node grandchild ${STATE.activeNode===childKey?'active':''}" onclick="navTo('${childKey}')">
-          <span class="node-icon">${child.icon}</span> ${child.label}
-          <span class="node-cmd">${child.cmd}</span>
-        </div>`;
+  // Try removing each token
+  for (var i=0;i<tokens.length;i++){
+    var reduced = tokens.filter(function(_,j){return j!==i;}).join(' ');
+    var hits = scoreAll(reduced).filter(function(r){return r.score>0.12;});
+    if (hits.length) {
+      suggestions.push({
+        removedToken: tokens[i],
+        reduced: reduced,
+        topMatch: hits[0]
       });
     }
-  });
-
-  list.innerHTML = html;
-}
-
-// ── BREADCRUMB ─────────────────────────────────────────────────────────────
-function renderBreadcrumb() {
-  const node = TREE[STATE.activeNode];
-  const crumbs = [];
-  let cur = STATE.activeNode;
-  while (cur && cur !== 'root') {
-    crumbs.unshift({ key: cur, label: TREE[cur].label });
-    cur = TREE[cur].parent;
   }
-  crumbs.unshift({ key: 'root', label: '~' });
 
-  let html = crumbs.map((c,i) =>
-    `<span class="bc-seg ${i===crumbs.length-1?'active':''}" onclick="navTo('${c.key}')">${c.label}</span>`
-  ).join('<span class="bc-arrow"> › </span>');
+  // Also try fuzzy-correcting each token
+  var corrections = [];
+  for (var i=0;i<tokens.length;i++){
+    var bestWordMatch = null, bestWordScore = 0;
+    // Check token against all words in all commands
+    ALL_CMDS.forEach(function(c){
+      c.cmd.split(' ').forEach(function(cw){
+        var d = lev(tokens[i].toLowerCase(), cw.toLowerCase());
+        var sc = 1 - d/Math.max(tokens[i].length,cw.length,1);
+        if (sc > bestWordScore && sc > 0.5 && cw !== tokens[i]){
+          bestWordScore = sc; bestWordMatch = cw;
+        }
+      });
+    });
+    if (bestWordMatch) {
+      corrections.push({original:tokens[i], corrected:bestWordMatch});
+    }
+  }
 
-  document.getElementById('breadcrumb').innerHTML = html;
+  return {type:'removal', suggestions:suggestions, corrections:corrections, tokens:tokens};
 }
 
-// ── CODE VIEW ─────────────────────────────────────────────────────────────
-function renderCodeView() {
-  const node = TREE[STATE.activeNode];
-  const codeView = document.getElementById('code-view');
-  if (!STATE.settings.codeView || STATE.view !== 'chat') {
-    codeView.classList.remove('visible');
+function scoreAll(q) {
+  return ALL_CMDS.map(function(c){
+    return {cmd:c.cmd, desc:c.desc, key:c.key, domain:c.domain, score:hybridScore(q,c.cmd,c.desc)};
+  }).sort(function(a,b){return b.score-a.score;});
+}
+
+// ── SUGGESTION DROPDOWN ─────────────────────────────────────────────
+var THRESHOLD = 0.13;
+var MAX_SHOW = 5;
+
+function updateSugs(val) {
+  if (!val || !val.trim()) { hideSugs(); return; }
+  var q = val.trim();
+  var results = scoreAll(q);
+  var matches = results.filter(function(r){return r.score>THRESHOLD;});
+
+  var el = document.getElementById('sugs');
+
+  if (matches.length === 0) {
+    // ZERO MATCH — analyze and show hint
+    var analysis = analyzeZeroMatch(q);
+    var hint = '';
+
+    if (analysis.type === 'removal' && analysis.suggestions.length) {
+      var s = analysis.suggestions[0];
+      hint = '<div style="padding:.42rem .85rem;font-size:.7rem;color:var(--amber-lt);font-family:JetBrains Mono,monospace">'
+        +'&#x26A0; No match. Try removing <em style="color:var(--white)">'+safeH(s.removedToken)+'</em>'
+        +(s.topMatch?' &rsaquo; <span style="color:var(--teal-lt)">'+safeH(s.topMatch.cmd)+'</span>':'')
+        +'</div>';
+    } else if (analysis.corrections && analysis.corrections.length) {
+      var corr = analysis.corrections[0];
+      hint = '<div style="padding:.42rem .85rem;font-size:.7rem;color:var(--amber-lt);font-family:JetBrains Mono,monospace">'
+        +'&#x26A0; Did you mean <em style="color:var(--white)">'+safeH(corr.corrected)+'</em> instead of <em>'+safeH(corr.original)+'</em>?'
+        +'</div>';
+    } else if (analysis.type === 'closest' && analysis.items.length && analysis.items[0].score > 0.05) {
+      hint = '<div style="padding:.42rem .85rem;font-size:.7rem;color:var(--muted);font-family:JetBrains Mono,monospace">'
+        +'No exact match. Closest: <span style="color:var(--teal-lt)">'+safeH(analysis.items[0].cmd)+'</span>'
+        +'</div>';
+    } else {
+      hint = '<div style="padding:.42rem .85rem;font-size:.7rem;color:var(--muted);font-family:JetBrains Mono,monospace">No commands match this input.</div>';
+    }
+
+    el.innerHTML = hint;
+    el.classList.add('on');
+    ST.hi = -1;
     return;
   }
-  codeView.classList.add('visible');
-  document.getElementById('code-context').textContent = node.cmd;
 
-  let tree = '';
-  if (node.children && node.children.length) {
-    const childLines = node.children.map(k => {
-      const c = TREE[k];
-      return `  ├─ ${c.cmd.padEnd(16)} ${c.label}`;
-    });
-    tree = childLines.join('\n');
-  } else if (node.parent) {
-    tree = `  parent: ${TREE[node.parent].cmd}\n  scope: leaf node`;
-  }
-  document.getElementById('code-tree-display').textContent = tree;
-}
+  var showing = matches.slice(0, MAX_SHOW);
+  var overflow = matches.length > MAX_SHOW;
+  var domColors = {self:'var(--gold)',mutual:'var(--violet-lt)',civic:'var(--sky-lt)',commerce:'var(--amber-lt)',global:'var(--emerald-lt)',universal:'#C7D2FE'};
 
-// ── APP GRID VIEW ─────────────────────────────────────────────────────────
-function renderAppGrid() {
-  const view = document.getElementById('app-grid-view');
-  const node = TREE[STATE.activeNode];
-  const rootChildren = TREE.root.children;
+  var html = showing.map(function(r, i){
+    var col = domColors[r.domain] || 'var(--teal-lt)';
+    var pct = Math.round(r.score * 100);
+    return '<div class="sug'+(i===ST.hi?' hi':'')+'" onclick="selSug(\''+safeH(r.cmd)+'\')">'
+      +'<span class="scmd" style="color:'+col+'">'+safeH(r.cmd)+'</span>'
+      +'<span class="sdesc">'+safeH(r.desc)+'</span>'
+      +'<span class="sbadge" style="color:'+col+';border-color:'+col+'40;background:'+col+'14">'+safeH(r.domain)+'</span>'
+      +'</div>';
+  }).join('');
 
-  let html = '';
-  if (STATE.activeNode === 'root') {
-    html = `<div class="grid-title">Sage · Phase 1</div>
-    <div class="grid-subtitle">All domain trees · tap to navigate</div>
-    <div class="box-grid">`;
-    rootChildren.forEach(key => {
-      const n = TREE[key];
-      html += `<div class="box-node parent-box ${STATE.activeNode===key?'selected':''}" onclick="navTo('${key}')">
-        <div class="box-label">${n.icon} ${n.label}</div>
-        <div class="box-cmd">${n.cmd}</div>
-        <div class="box-count">${n.children.length} nodes</div>
-      </div>`;
-    });
-    html += `</div>`;
-  } else {
-    // Show parent domain + children
-    const domainKey = node.parent === 'root' ? STATE.activeNode : node.parent;
-    const domain = TREE[domainKey];
-    html = `<div class="grid-title">${domain.icon} ${domain.label}</div>
-    <div class="grid-subtitle"><span class="box-cmd" style="font-family:JetBrains Mono,monospace;font-size:0.72rem;color:var(--teal-lt)">${domain.cmd}</span> · ${domain.children.length} sub-nodes</div>
-    <div class="box-grid">`;
-    html += `<div class="box-node parent-box selected" onclick="navTo('${domainKey}')">
-      <div class="box-label">${domain.icon} ${domain.label}</div>
-      <div class="box-cmd">${domain.cmd}</div>
-    </div>
-    <div class="grid-arrow">›</div>`;
-    domain.children.forEach(key => {
-      const n = TREE[key];
-      html += `<div class="box-node ${STATE.activeNode===key?'selected':''}" onclick="navTo('${key}')">
-        <div class="box-label">${n.icon} ${n.label}</div>
-        <div class="box-cmd">${n.cmd}</div>
-      </div>`;
-    });
-    html += `</div>`;
-
-    // Entries for active leaf
-    const entries = STATE.entries[STATE.activeNode] || [];
-    if (entries.length) {
-      html += `<div class="child-grid">`;
-      entries.forEach(e => {
-        html += `<div class="box-node" style="min-width:200px;max-width:300px">
-          <div class="box-cmd">${e.timestamp}</div>
-          <div class="box-label" style="font-size:0.8rem;font-weight:400;color:var(--body);margin-top:0.25rem">${e.preview}</div>
-        </div>`;
-      });
-      html += `</div>`;
-    }
+  if (overflow) {
+    html += '<div style="padding:.35rem .85rem;font-size:.62rem;color:var(--muted);font-family:JetBrains Mono,monospace;border-top:1px solid var(--border)">'
+      +'More than 5 matches &mdash; keep typing to narrow'
+      +'</div>';
   }
 
-  view.innerHTML = html;
+  el.innerHTML = html;
+  el.classList.add('on');
+  ST.hi = -1;
 }
 
-// ── NAVIGATION ────────────────────────────────────────────────────────────
-function navTo(key) {
-  STATE.activeNode = key;
-  renderTree();
-  renderBreadcrumb();
-  renderCodeView();
-  if (STATE.view === 'app') renderAppGrid();
+function safeH(t){return t?String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';}  var sH=safeH;
+
+// updateSugs defined above in STARDUST SMART INPUT ENGINE
+
+function hideSugs(){document.getElementById('sugs').classList.remove('on');ST.hi=-1;}
+function selSug(cmd){var b=document.getElementById('ibox');b.value=cmd+' ';b.focus();hideSugs();document.getElementById('sbtn').disabled=false;}
+function handleInput(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,98)+'px';document.getElementById('sbtn').disabled=!el.value.trim();updateSugs(el.value);}
+function handleKey(e){
+  var sugs=document.getElementById('sugs');var items=sugs.querySelectorAll('.sug');
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(ST.hi>=0&&items[ST.hi])items[ST.hi].click();else send();}
+  else if(e.key==='Tab'&&sugs.classList.contains('on')){e.preventDefault();ST.hi=(ST.hi+1)%items.length;items.forEach(function(it,i){it.classList.toggle('hi',i===ST.hi);});}
+  else if(e.key==='Escape'){hideSugs();document.getElementById('ibox').value='';document.getElementById('sbtn').disabled=true;}
 }
-
-// ── VIEW SWITCH ───────────────────────────────────────────────────────────
-function setView(v) {
-  STATE.view = v;
-  document.getElementById('btn-chat').classList.toggle('active', v==='chat');
-  document.getElementById('btn-app').classList.toggle('active', v==='app');
-  document.getElementById('chat-view').style.display = v==='chat'?'flex':'none';
-  document.getElementById('app-grid-view').classList.toggle('visible', v==='app');
-  renderCodeView();
-  if (v==='app') renderAppGrid();
-}
-
-// ── PANEL ─────────────────────────────────────────────────────────────────
-function togglePanel(which) {
-  if (STATE.panel === which) { closePanel(); return; }
-  STATE.panel = which;
-  document.getElementById('right-panel').classList.remove('collapsed');
-  document.getElementById('panel-title').textContent =
-    which === 'dict' ? 'Dictionaries' : 'Settings';
-  renderPanel(which);
-}
-
-function closePanel() {
-  STATE.panel = null;
-  document.getElementById('right-panel').classList.add('collapsed');
-}
-
-function renderPanel(which) {
-  const body = document.getElementById('panel-body');
-  if (which === 'dict') {
-    const dicts = [
-      { key:'core', name:'CORE.txt', desc:'Default baseline. Human nature, instincts, broad permissions. Cannot be removed.' },
-      { key:'urbanwolf', name:'URBANWOLF.txt', desc:'Urban infrastructure lens. Civic-first, community-coded tone.' },
-      { key:'outlaw', name:'THEOUTLAW.txt', desc:'Radical privacy. Encrypts all output. Suppresses institutional nodes.' },
-    ];
-    body.innerHTML = dicts.map(d => `
-      <div class="dict-item" onclick="toggleDict('${d.key}')">
-        <div class="dict-check-row">
-          <div class="dict-check ${STATE.dicts[d.key]?'checked':''}" id="chk-${d.key}">${STATE.dicts[d.key]?'✓':''}</div>
-          <div class="dict-name-label">${d.name}</div>
-        </div>
-        <div class="dict-desc-sm">${d.desc}</div>
-      </div>
-    `).join('') + `<div style="padding:0.75rem 1rem;border-top:1px solid var(--border)">
-      <div style="font-size:0.72rem;color:var(--muted);line-height:1.6">Personal dictionary coming in full release. Submit custom functions via developer pipeline.</div>
-    </div>`;
-  } else {
-    const settings = [
-      { key:'voice', label:'Voice input (mic on)' },
-      { key:'suggestions', label:'Live suggestions dropdown' },
-      { key:'codeView', label:'Show STARDUST code view' },
-      { key:'autoChain', label:'Auto-chain suggestions' },
-    ];
-    body.innerHTML = settings.map(s => `
-      <div class="settings-row">
-        <span class="settings-label">${s.label}</span>
-        <button class="toggle ${STATE.settings[s.key]?'on':''}" id="tog-${s.key}" onclick="toggleSetting('${s.key}')"></button>
-      </div>
-    `).join('');
-  }
-}
-
-function toggleDict(key) {
-  if (key === 'core') return; // core always on
-  STATE.dicts[key] = !STATE.dicts[key];
-  renderPanel('dict');
-  addMessage('sage', `Dictionary ${STATE.dicts[key]?'activated':'deactivated'}: <span class="msg-cmd">${key}.txt</span>. Context reloaded.`);
-}
-
-function toggleSetting(key) {
-  STATE.settings[key] = !STATE.settings[key];
-  renderPanel('settings');
-  if (key === 'codeView') renderCodeView();
-}
-
-// ── SUGGESTIONS ───────────────────────────────────────────────────────────
-function updateSuggestions(val) {
-  if (!STATE.settings.suggestions || !val.trim()) {
-    hideSuggestions(); return;
-  }
-  const q = val.toLowerCase().trim();
-  const matches = SUGGESTIONS.filter(s =>
-    s.cmd.includes(q) || s.desc.toLowerCase().includes(q) || q.split(' ').every(w=>s.cmd.includes(w))
-  ).slice(0, 6);
-
-  if (!matches.length) { hideSuggestions(); return; }
-
-  const el = document.getElementById('suggestions');
-  el.innerHTML = matches.map((m,i) => `
-    <div class="sug-item" onclick="selectSuggestion('${m.cmd}')" data-idx="${i}">
-      <span class="sug-cmd">${m.cmd}</span>
-      <span class="sug-desc">${m.desc}</span>
-      <span class="sug-badge">${m.badge}</span>
-    </div>
-  `).join('');
-  el.classList.add('visible');
-  STATE.sugHighlight = -1;
-}
-
-function hideSuggestions() {
-  document.getElementById('suggestions').classList.remove('visible');
-  STATE.sugHighlight = -1;
-}
-
-function selectSuggestion(cmd) {
-  const box = document.getElementById('input-box');
-  box.value = cmd + ' ';
-  box.focus();
-  hideSuggestions();
-  document.getElementById('send-btn').disabled = false;
-}
-
-// ── CHAT ──────────────────────────────────────────────────────────────────
-function addMessage(role, html, isHtml=true) {
-  const empty = document.getElementById('empty-state');
-  if (empty) empty.remove();
-
-  const container = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'msg';
-
-  if (role === 'sage') {
-    div.innerHTML = `
-      <div class="msg-avatar sage">S</div>
-      <div class="msg-content">
-        <div class="msg-name">Sage · STARDUST</div>
-        <div class="msg-text">${isHtml ? html : escHtml(html)}</div>
-      </div>`;
-  } else {
-    div.innerHTML = `
-      <div class="msg-avatar user">U</div>
-      <div class="msg-content">
-        <div class="msg-name">You</div>
-        <div class="msg-text user-text">${isHtml ? html : escHtml(html)}</div>
-      </div>`;
-  }
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-  return div;
-}
-
-function addLoadingMsg() {
-  const container = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'msg';
-  div.id = 'loading-msg';
-  div.innerHTML = `
-    <div class="msg-avatar sage">S</div>
-    <div class="msg-content">
-      <div class="msg-name">Sage · STARDUST</div>
-      <div class="msg-text"><div class="loading-dots"><span></span><span></span><span></span></div></div>
-    </div>`;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-}
-
-function removeLoadingMsg() {
-  const el = document.getElementById('loading-msg');
-  if (el) el.remove();
-}
-
-function formatReply(text) {
-  // Format entry cards, code blocks, and AETs nicely
-  let html = text
-    .replace(/\[([A-Z ·.]+)\]/g, '<div class="entry-tag">$1</div>')
-    .replace(/```([\s\S]*?)```/g, '<div class="msg-tree">$1</div>')
-    .replace(/`([^`]+)`/g, '<span class="msg-cmd">$1</span>')
-    .replace(/WRITE\(|ENCRYPT\(|STORE\(|READ\(|SCHEDULE\(|FIND\(|DONATE\(|SEND\(/g, m => `<span style="color:var(--gold-soft)">${m}</span>`)
-    .replace(/\n/g, '<br>');
-  return html;
-}
-
-async function sendMessage() {
-  const box = document.getElementById('input-box');
-  const val = box.value.trim();
-  if (!val) return;
-
-  hideSuggestions();
-  box.value = '';
-  box.style.height = 'auto';
-  document.getElementById('send-btn').disabled = true;
-
-  addMessage('user', `<span class="msg-cmd">${escHtml(val)}</span>`);
-
-  // Auto-navigate based on command prefix
-  autoNavigate(val);
-
-  addLoadingMsg();
-
-  try {
-    const reply = await callSage(val);
-    removeLoadingMsg();
-    const msgEl = addMessage('sage', formatReply(reply));
-
-    // Store entry if private domain
-    storeEntryIfPrivate(val, reply);
-    if (STATE.view === 'app') renderAppGrid();
-  } catch(e) {
-    removeLoadingMsg();
-    addMessage('sage', 'Connection error. Check your network and try again.');
-  }
-}
-
-function autoNavigate(cmd) {
-  const c = cmd.toLowerCase();
-  if (c.startsWith('prv diary')) navTo('prv_diary');
-  else if (c.startsWith('prv lust')) navTo('prv_lust');
-  else if (c.startsWith('prv drm')) navTo('prv_drm');
-  else if (c.startsWith('prv trma')) navTo('prv_trma');
-  else if (c.startsWith('prv rage')) navTo('prv_rage');
-  else if (c.startsWith('prv blf')) navTo('prv_blf');
-  else if (c.startsWith('prv lgcy')) navTo('prv_lgcy');
-  else if (c.startsWith('prv')) navTo('prv');
-  else if (c.startsWith('hm util')) navTo('hm_util');
-  else if (c.startsWith('hm rsrc')) navTo('hm_rsrc');
-  else if (c.startsWith('hm mnt')) navTo('hm_mnt');
-  else if (c.startsWith('hm fin')) navTo('hm_fin');
-  else if (c.startsWith('hm')) navTo('hm');
-  else if (c.startsWith('soc frnd')) navTo('soc_frnd');
-  else if (c.startsWith('soc dat')) navTo('soc_dat');
-  else if (c.startsWith('soc')) navTo('soc');
-  else if (c.startsWith('pln goal')) navTo('pln_goal');
-  else if (c.startsWith('pln evnt')) navTo('pln_evnt');
-  else if (c.startsWith('pln place')) navTo('pln_place');
-  else if (c.startsWith('pln idea')) navTo('pln_idea');
-  else if (c.startsWith('pln trvl')) navTo('pln_trvl');
-  else if (c.startsWith('pln mlstn')) navTo('pln_mlstn');
-  else if (c.startsWith('pln')) navTo('pln');
-  else if (c.startsWith('knw')) navTo('knw');
-}
-
-function storeEntryIfPrivate(cmd, reply) {
-  const c = cmd.toLowerCase();
-  let nodeKey = null;
-  if (c.startsWith('prv diary')) nodeKey = 'prv_diary';
-  else if (c.startsWith('prv lust')) nodeKey = 'prv_lust';
-  else if (c.startsWith('prv drm')) nodeKey = 'prv_drm';
-  else if (c.startsWith('pln goal')) nodeKey = 'pln_goal';
-  else if (c.startsWith('pln evnt')) nodeKey = 'pln_evnt';
-  else if (c.startsWith('pln place')) nodeKey = 'pln_place';
-  else if (c.startsWith('hm util')) nodeKey = 'hm_util';
-  else if (c.startsWith('soc frnd')) nodeKey = 'soc_frnd';
-
-  if (nodeKey) {
-    if (!STATE.entries[nodeKey]) STATE.entries[nodeKey] = [];
-    const words = cmd.split(' ').slice(2).join(' ');
-    STATE.entries[nodeKey].unshift({
-      timestamp: new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
-      preview: words.slice(0, 60) + (words.length > 60 ? '…' : ''),
-    });
-  }
-}
-
-// ── INPUT HANDLING ─────────────────────────────────────────────────────────
-function handleInput(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-  document.getElementById('send-btn').disabled = !el.value.trim();
-  updateSuggestions(el.value);
-}
-
-function handleKey(e) {
-  const sugs = document.getElementById('suggestions');
-  const items = sugs.querySelectorAll('.sug-item');
-
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    if (STATE.sugHighlight >= 0 && items[STATE.sugHighlight]) {
-      items[STATE.sugHighlight].click();
-    } else {
-      sendMessage();
-    }
-  } else if (e.key === 'Tab' && sugs.classList.contains('visible')) {
-    e.preventDefault();
-    STATE.sugHighlight = (STATE.sugHighlight + 1) % items.length;
-    items.forEach((item,i) => item.classList.toggle('highlighted', i===STATE.sugHighlight));
-  } else if (e.key === 'Escape') {
-    hideSuggestions();
-    document.getElementById('input-box').value = '';
-    document.getElementById('send-btn').disabled = true;
-  }
-}
-
-function useChip(cmd) {
-  const box = document.getElementById('input-box');
-  box.value = cmd;
-  box.focus();
-  document.getElementById('send-btn').disabled = false;
-  handleInput(box);
-}
-
-function escHtml(t) {
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────
-function init() {
-  renderTree();
-  renderBreadcrumb();
-  renderCodeView();
-  setView('chat');
-
-  // Initial greeting
-  setTimeout(() => {
-    addMessage('sage', `Welcome. I am <strong style="color:var(--gold-soft)">Sage</strong>, running on STARDUST.<br><br>
-Your private domain is encrypted on this device. No server holds your keys. Type the shortest abbreviation of what you want — I resolve, chain, and execute.<br><br>
-Try <span class="msg-cmd">prv diary wrt</span> to write your first entry, or tap a quick command below.`);
-  }, 400);
-}
-
-init();
+function useChip(cmd){var b=document.getElementById('ibox');b.value=cmd;b.focus();document.getElementById('sbtn').disabled=false;handleInput(b);}
 </script>
 </body>
 </html>
